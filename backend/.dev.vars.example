@@ -1,0 +1,12 @@
+# Copy this file to `.dev.vars` (gitignored) for local `wrangler dev`.
+# NEVER commit `.dev.vars` or real secret values. Placeholders only below.
+#
+# In production these are set with `wrangler secret put <NAME>` instead.
+
+# Optional: legacy HS256 Supabase JWT signing secret. Leave blank to rely on
+# asymmetric (JWKS) verification only.
+SUPABASE_JWT_SECRET=
+
+# Shared secret used to authenticate the RevenueCat webhook. If blank, the
+# webhook accepts unauthenticated requests in template mode (a warning is logged).
+REVENUECAT_WEBHOOK_SECRET=

@@ -1,0 +1,50 @@
+# ─────────────────────────────────────────────────────────────
+# SECRETS — never commit. All credentials live in .cowork-private/
+# ─────────────────────────────────────────────────────────────
+.cowork-private/
+*.env
+!*.env.example
+.dev.vars
+!.dev.vars.example
+*.pem
+*.key
+*-service-account*.json
+secrets.*
+
+# ── App live config (dart-define-from-file; non-secret but env-specific) ──
+app/config/*.json
+!app/config/*.example.json
+
+# ── Flutter / Dart ──
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/build/
+app/.idea/
+app/*.iml
+app/.packages
+app/pubspec.lock
+app/ios/Pods/
+app/android/.gradle/
+app/android/local.properties
+app/**/GeneratedPluginRegistrant.*
+app/windows/flutter/ephemeral/
+app/linux/flutter/ephemeral/
+app/macos/Flutter/ephemeral/
+
+# ── Node / Cloudflare Worker ──
+backend/node_modules/
+backend/.wrangler/
+backend/dist/
+backend/.dev.vars
+
+# ── OS / editor ──
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+
+# ── Internal planning docs (kept OUT of the public repo, owner's choice) ──
+/PROJECT_STATE.md
+/Backend Research - Firebase vs Cloudflare (July 2026).md
+/Subscription tracker app design/

@@ -1,0 +1,231 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
+import '../../data/models/subscription.dart';
+import '../../data/seed/demo_data.dart';
+import '../../state/subscriptions_controller.dart';
+import '../shared/widgets.dart';
+
+Future<void> showAddSubscriptionSheet(BuildContext context) {
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => const _AddSheet(),
+  );
+}
+
+class _AddSheet extends ConsumerStatefulWidget {
+  const _AddSheet();
+
+  @override
+  ConsumerState<_AddSheet> createState() => _AddSheetState();
+}
+
+class _AddSheetState extends ConsumerState<_AddSheet> {
+  final TextEditingController _name = TextEditingController();
+  final TextEditingController _price = TextEditingController();
+  BillingCycle _cycle = BillingCycle.monthly;
+  bool _saving = false;
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _price.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    setState(() => _saving = true);
+    final Subscription draft = Subscription(
+      id: '',
+      name: _name.text.trim(),
+      category: 'Other',
+      price: double.tryParse(_price.text.trim()) ?? 9.99,
+      cycle: _cycle,
+      nextRenewal: DateTime.now().add(const Duration(days: 12)),
+    );
+    await ref.read(subscriptionsControllerProvider.notifier).addSubscription(draft);
+    if (mounted) Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: Container(
+        constraints:
+            BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.86),
+        decoration: const BoxDecoration(
+          color: AppColors.bg,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        padding: const EdgeInsets.fromLTRB(18, 12, 18, 24),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                      color: AppColors.line, borderRadius: BorderRadius.circular(4)),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text('Add subscription', style: AppText.title.copyWith(fontSize: 22)),
+              const SizedBox(height: 14),
+              Text('POPULAR', style: AppText.label),
+              const SizedBox(height: 9),
+              GridView.count(
+                crossAxisCount: 4,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 9,
+                crossAxisSpacing: 9,
+                childAspectRatio: 0.82,
+                children: DemoData.popular
+                    .map((List<String> p) => GestureDetector(
+                          onTap: () => _name.text = p[0],
+                          child: Column(
+                            children: <Widget>[
+                              Expanded(
+                                child: Container(
+                                  width: double.infinity,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(13),
+                                    gradient: const LinearGradient(colors: <Color>[
+                                      Color.fromRGBO(100, 89, 245, 0.13),
+                                      Color.fromRGBO(155, 107, 255, 0.13),
+                                    ]),
+                                  ),
+                                  child: Text(p[1],
+                                      style: const TextStyle(
+                                          fontFamily: 'Space Grotesk',
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 13,
+                                          color: AppColors.accent)),
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(p[0],
+                                  style: AppText.muted.copyWith(fontSize: 10),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis),
+                            ],
+                          ),
+                        ))
+                    .toList(),
+              ),
+              const SizedBox(height: 16),
+              Text('NAME', style: AppText.label),
+              const SizedBox(height: 6),
+              _input(_name, 'e.g. Hulu'),
+              const SizedBox(height: 12),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text('PRICE', style: AppText.label),
+                        const SizedBox(height: 6),
+                        _input(_price, '9.99',
+                            keyboard:
+                                const TextInputType.numberWithOptions(decimal: true)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text('CYCLE', style: AppText.label),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: <Widget>[
+                            _cycleBtn('Monthly', BillingCycle.monthly),
+                            const SizedBox(width: 6),
+                            _cycleBtn('Yearly', BillingCycle.yearly),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: <Widget>[
+                  SoftButton(label: 'Cancel', onPressed: () => Navigator.of(context).pop()),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: GradientButton(
+                      label: _saving ? 'Adding…' : 'Add subscription',
+                      onPressed: _saving ? null : _save,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _cycleBtn(String label, BillingCycle cycle) {
+    final bool sel = _cycle == cycle;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _cycle = cycle),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            gradient: sel ? AppColors.brandGradient : null,
+            color: sel ? null : AppColors.surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: sel ? Colors.transparent : AppColors.line),
+          ),
+          child: Text(label,
+              style: TextStyle(
+                  fontFamily: 'Manrope',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  color: sel ? Colors.white : AppColors.ink)),
+        ),
+      ),
+    );
+  }
+
+  Widget _input(TextEditingController c, String hint,
+      {TextInputType keyboard = TextInputType.text}) {
+    return TextField(
+      controller: c,
+      keyboardType: keyboard,
+      style: AppText.body.copyWith(fontWeight: FontWeight.w600),
+      decoration: InputDecoration(
+        hintText: hint,
+        filled: true,
+        fillColor: AppColors.surface,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.line),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
+        ),
+      ),
+    );
+  }
+}

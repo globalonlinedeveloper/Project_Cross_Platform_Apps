@@ -1,0 +1,16 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    prefer_final_locals: true
+    avoid_print: true
+    # prefer_const_constructors intentionally left off: keeps the template's
+    # analyze green without hand-annotating every const call site. Enable it and
+    # run `dart fix --apply` if you want const enforcement.
+
+analyzer:
+  language:
+    strict-casts: true
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"

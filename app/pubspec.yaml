@@ -1,0 +1,105 @@
+name: subly
+description: "Subly — a cross-platform subscription tracker. App #1 and the reusable template for the Cross Platform Apps portfolio."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.5.0
+
+  # Navigation (real URLs on web; deep links on all 6 platforms)
+  go_router: ^14.2.0
+
+  # HTTP client for the Cloudflare Worker API (bearer-token interceptor)
+  dio: ^5.4.0
+
+  # Shared identity — pure REST, works on all 6 platforms (no desktop delegate)
+  supabase_flutter: ^2.5.0
+
+  # On-device renewal reminders (iOS/Android/macOS/Windows/Linux)
+  flutter_local_notifications: ^17.2.0
+  timezone: ^0.9.4
+
+  intl: ^0.19.0
+  cupertino_icons: ^1.0.8
+
+  # Open external URLs (nikatru.com legal pages + company site) on all 6 platforms.
+  url_launcher: ^6.3.0
+
+  # RevenueCat is STUBBED (see lib/services/purchases/). To wire the real SDK,
+  # uncomment and implement RevenueCatPurchasesService:
+  #   purchases_flutter: ^8.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Nikatru co-branding lockups (light + dark) and icon, used by NikatruWordmark.
+  assets:
+    - assets/brand/
+
+  # The design uses Manrope (body) + Space Grotesk (numerals/titles). Drop the .ttf
+  # files under app/assets/fonts/ and uncomment to match the mockup exactly. Without
+  # them the app still runs, falling back to the platform default font.
+  # fonts:
+  #   - family: Manrope
+  #     fonts:
+  #       - asset: assets/fonts/Manrope-Regular.ttf
+  #       - asset: assets/fonts/Manrope-Bold.ttf
+  #         weight: 700
+  #   - family: Space Grotesk
+  #     fonts:
+  #       - asset: assets/fonts/SpaceGrotesk-Bold.ttf
+  #         weight: 700
+
+# ─────────────────────────────────────────────────────────────────────────────
+# STAGED: app-icon + splash co-branding (owner runs — needs the Flutter SDK)
+# ─────────────────────────────────────────────────────────────────────────────
+# DESIGN DECISION FIRST: every portfolio app needs a DISTINCT store icon, so the
+# app icon should be Subly's OWN mark, NOT the Nikatru company mark (else all
+# apps look identical on the home screen / stores). Options:
+#   A) Subly's own icon (recommended) — design a Subly glyph, save it at
+#      assets/brand/subly-icon.png (1024x1024), and point image_path at it.
+#   B) Nikatru company mark as the icon — use assets/brand/nikatru-icon.png
+#      (already bundled). OK for a single-app launch; revisit at app #2.
+# The SPLASH co-brands safely either way (mark on brand-ink background).
+#
+# To apply: add the two dev_dependencies, uncomment the blocks, then run:
+#   flutter pub get
+#   dart run flutter_launcher_icons
+#   dart run flutter_native_splash:create
+#
+# dev_dependencies:
+#   flutter_launcher_icons: ^0.14.1
+#   flutter_native_splash: ^2.4.1
+#
+# flutter_launcher_icons:
+#   image_path: "assets/brand/nikatru-icon.png"   # option A: swap to Subly's own icon
+#   android: true
+#   ios: true
+#   remove_alpha_ios: true
+#   web:
+#     generate: true
+#   windows:
+#     generate: true
+#     icon_size: 256
+#   macos:
+#     generate: true
+#
+# flutter_native_splash:
+#   color: "#0B1220"        # Nikatru ink
+#   image: "assets/brand/nikatru-icon.png"
+#   android: true
+#   ios: true
+#   web: true

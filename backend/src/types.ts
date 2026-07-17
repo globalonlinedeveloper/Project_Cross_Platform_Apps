@@ -1,0 +1,87 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Shared types for the Worker. Keep the Env interface in sync with wrangler.toml.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Worker bindings + environment. Names must match wrangler.toml bindings.
+ * Secrets are optional here because they arrive via `wrangler secret put` /
+ * .dev.vars and may be absent in template mode.
+ */
+export interface Env {
+  // D1 databases
+  APP_DB: D1Database; // per-app data (subscriptions, budgets, ...)
+  PLATFORM_DB: D1Database; // shared entitlements across the portfolio
+
+  // KV — caches the Supabase JWKS document
+  JWKS_CACHE: KVNamespace;
+
+  // R2 — CSV exports / receipts
+  EXPORTS: R2Bucket;
+
+  // Non-secret vars (wrangler.toml [vars])
+  APP_ID: string;
+  SUPABASE_URL: string;
+  API_VERSION: string;
+  /** Comma-separated browser origins for CORS. Absent/empty ⇒ '*' (template). */
+  ALLOWED_ORIGINS?: string;
+
+  // Secrets (wrangler secret put / .dev.vars) — optional in template mode
+  SUPABASE_JWT_SECRET?: string;
+  REVENUECAT_WEBHOOK_SECRET?: string;
+}
+
+/**
+ * Hono context Variables set by middleware (c.get / c.set).
+ */
+export interface Variables {
+  userId: string;
+  userEmail?: string;
+  /** Correlation id stamped by the request-id middleware (echoed in headers). */
+  requestId: string;
+}
+
+/** Convenience: the generics shape used across the app and sub-routers. */
+export type AppEnv = { Bindings: Env; Variables: Variables };
+
+/**
+ * A subscription row. Mirrors the `subscriptions` table 1:1.
+ * NOTE: `unused` is stored as 0/1 in D1 but serialized to a JSON boolean at the
+ * route boundary (see serializeSubscription in routes/subscriptions.ts).
+ */
+export interface Subscription {
+  id: string;
+  user_id: string;
+  name: string | null;
+  category: string | null;
+  price: number | null;
+  cycle: 'monthly' | 'yearly' | null;
+  next_renewal: string | null; // 'YYYY-MM-DD'
+  plan: string | null;
+  glyph: string | null;
+  used_pct: number;
+  usage_note: string | null;
+  unused: number; // 0 | 1 in DB
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+/** A payment_history row. */
+export interface Payment {
+  id: string;
+  subscription_id: string | null;
+  user_id: string | null;
+  amount: number | null;
+  paid_at: string | null;
+}
+
+/** An entitlements row (PLATFORM_DB). */
+export interface Entitlement {
+  user_id: string;
+  app_id: string;
+  entitlement: string;
+  product_id: string | null;
+  store: string | null;
+  is_active: number; // 0 | 1 in DB
+  expires_at: string | null;
+  updated_at: string | null;
+}

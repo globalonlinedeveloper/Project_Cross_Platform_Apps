@@ -1,0 +1,58 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Cloudflare Worker config — Subly API (reusable tracker-app template)
+# ─────────────────────────────────────────────────────────────────────────────
+# CLONE-FOR-NEXT-APP: change `name`, [vars].APP_ID, and the APP_DB database_name/
+# database_id. Keep PLATFORM_DB and SUPABASE_URL identical across every app so all
+# apps share ONE entitlements table and ONE Supabase identity project.
+#
+# SECRETS are NOT set here. Set them out-of-band (never committed):
+#   wrangler secret put SUPABASE_JWT_SECRET       # optional HS256 legacy fallback
+#   wrangler secret put REVENUECAT_WEBHOOK_SECRET  # RevenueCat webhook auth
+# For local dev, copy .dev.vars.example -> .dev.vars (gitignored).
+# ─────────────────────────────────────────────────────────────────────────────
+
+name = "subly-api"
+main = "src/index.ts"
+compatibility_date = "2026-07-01"
+
+[vars]
+# Non-secret build/runtime vars (safe to commit).
+APP_ID = "subly"
+# Shared Supabase identity project (Cross_Platform_Auth, Mumbai / ap-south-1).
+# Keep identical across every app in the portfolio.
+SUPABASE_URL = "https://lcrkiurkvzhkonjwhpiv.supabase.co"
+API_VERSION = "v1"
+# Browser origins allowed by CORS (comma-separated). Empty/absent = '*' (template
+# mode). Per-app: list this app's web origins only.
+ALLOWED_ORIGINS = "https://subly.nikatru.com,https://subly-9cp.pages.dev"
+
+# Per-app SQLite database (this app's private data). One per app.
+[[d1_databases]]
+binding = "APP_DB"
+database_name = "subly_db"
+# Created live via Cloudflare connector (APAC primary).
+database_id = "88da9026-f72a-4cda-823d-431148fa8112"
+migrations_dir = "migrations"
+
+# SHARED platform database (entitlements across the whole portfolio). Same id in
+# every app's wrangler.toml. Migration 0002 targets THIS database, not APP_DB.
+[[d1_databases]]
+binding = "PLATFORM_DB"
+database_name = "platform_db"
+# Created live via Cloudflare connector (APAC primary). Shared across all apps.
+database_id = "9d1c5c63-97fe-4f82-bc7d-f3fd22e9b351"
+
+# KV used to cache the Supabase JWKS document (cuts JWT-verify latency).
+[[kv_namespaces]]
+binding = "JWKS_CACHE"
+# Created live via Cloudflare connector (platform-jwks). Shared across all apps.
+id = "bcfcb1618d1a4bfd8d02f87d3d21010d"
+
+# R2 bucket for CSV exports / receipts.
+[[r2_buckets]]
+binding = "EXPORTS"
+bucket_name = "subly-exports"
+
+# Nightly cron (06:00 UTC): Supabase keep-alive + renewals recompute.
+[triggers]
+crons = ["0 6 * * *"]

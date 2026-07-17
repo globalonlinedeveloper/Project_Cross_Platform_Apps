@@ -1,0 +1,63 @@
+import 'dart:async';
+
+import 'auth_models.dart';
+import 'auth_repository.dart';
+
+/// In-memory auth used automatically when Supabase isn't configured, so the
+/// whole app is explorable (every screen, sign-in → scan → dashboard) with no
+/// backend. Never used once real credentials are supplied.
+class MockAuthRepository implements AuthRepository {
+  final StreamController<AuthUser?> _controller =
+      StreamController<AuthUser?>.broadcast();
+  AuthUser? _user;
+
+  AuthUser _demoUser(String email) => AuthUser(
+        id: 'demo-user',
+        email: email.isEmpty ? 'alex@example.com' : email,
+        displayName: 'Alex Rivera',
+      );
+
+  @override
+  AuthUser? get currentUser => _user;
+
+  @override
+  Stream<AuthUser?> authStateChanges() => _controller.stream;
+
+  @override
+  Future<AuthUser> signInWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    _user = _demoUser(email);
+    _controller.add(_user);
+    return _user!;
+  }
+
+  @override
+  Future<AuthUser> signUpWithEmail({
+    required String email,
+    required String password,
+  }) =>
+      signInWithEmail(email: email, password: password);
+
+  @override
+  Future<void> signInWithApple() async {
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    _user = _demoUser('alex@example.com');
+    _controller.add(_user);
+  }
+
+  @override
+  Future<void> sendPasswordReset(String email) async {}
+
+  @override
+  Future<void> signOut() async {
+    _user = null;
+    _controller.add(null);
+  }
+
+  @override
+  Future<String?> currentAccessToken() async =>
+      _user == null ? null : 'demo-token';
+}
