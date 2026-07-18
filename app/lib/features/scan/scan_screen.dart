@@ -116,11 +116,16 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
           ),
         ),
         const SizedBox(height: 28),
-        const SizedBox(
+        SizedBox(
           width: 200,
-          child: LinearProgressIndicator(
-            backgroundColor: AppColors.line,
-            color: AppColors.accent,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: _pct / 100,
+              minHeight: 6,
+              backgroundColor: AppColors.line,
+              color: AppColors.accent,
+            ),
           ),
         ),
         const SizedBox(height: 16),

@@ -16,10 +16,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final TextEditingController _email =
-      TextEditingController(text: 'alex@example.com');
-  final TextEditingController _password =
-      TextEditingController(text: 'password');
+  final TextEditingController _email = TextEditingController();
+  final TextEditingController _password = TextEditingController();
   bool _loading = false;
   bool _signUp = false;
 
@@ -31,6 +29,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _submit() async {
+    final String email = _email.text.trim();
+    if (email.isEmpty || _password.text.isEmpty) {
+      _snack('Enter your email and password.');
+      return;
+    }
+    if (!email.contains('@') || !email.contains('.')) {
+      _snack('Enter a valid email address.');
+      return;
+    }
     setState(() => _loading = true);
     final auth = ref.read(authRepositoryProvider);
     try {
@@ -65,8 +72,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void _snack(Object e) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+      SnackBar(content: Text(_friendlyMessage(e))),
     );
+  }
+
+  /// Maps raw auth/network errors onto short, human messages so users never see
+  /// a stack-tracey exception (e.g. Supabase's invalid_credentials).
+  String _friendlyMessage(Object e) {
+    if (e is String) return e;
+    final String raw = e.toString().toLowerCase();
+    if (raw.contains('invalid_credentials') || raw.contains('invalid login')) {
+      return 'Incorrect email or password.';
+    }
+    if (raw.contains('already registered') ||
+        raw.contains('already been registered') ||
+        raw.contains('user_already_exists')) {
+      return 'That email is already registered — try signing in.';
+    }
+    if (raw.contains('weak_password') || raw.contains('password should be')) {
+      return 'Password must be at least 6 characters.';
+    }
+    if (raw.contains('email_not_confirmed') || raw.contains('not confirmed')) {
+      return 'Please confirm your email, then sign in.';
+    }
+    if (raw.contains('rate limit') || raw.contains('over_email_send')) {
+      return 'Too many attempts — please wait a moment and try again.';
+    }
+    if (raw.contains('socketexception') ||
+        raw.contains('failed host lookup') ||
+        raw.contains('connection') ||
+        raw.contains('network')) {
+      return 'Network error — check your connection and try again.';
+    }
+    return 'Something went wrong. Please try again.';
   }
 
   @override
@@ -102,10 +140,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 28),
               _field('EMAIL', _email, TextInputType.emailAddress,
-                  fieldKey: E2EKeys.loginEmail),
+                  fieldKey: E2EKeys.loginEmail, hint: 'you@email.com'),
               const SizedBox(height: 14),
               _field('PASSWORD', _password, TextInputType.text,
-                  obscure: true, fieldKey: E2EKeys.loginPassword),
+                  obscure: true, fieldKey: E2EKeys.loginPassword,
+                  hint: 'Your password'),
               if (!_signUp)
                 Align(
                   alignment: Alignment.centerRight,
@@ -176,7 +215,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _field(String label, TextEditingController c, TextInputType type,
-      {bool obscure = false, Key? fieldKey}) {
+      {bool obscure = false, Key? fieldKey, String? hint}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -189,6 +228,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           keyboardType: type,
           style: AppText.body.copyWith(fontWeight: FontWeight.w600),
           decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: AppText.muted.copyWith(fontWeight: FontWeight.w500),
             filled: true,
             fillColor: AppColors.surface,
             contentPadding:

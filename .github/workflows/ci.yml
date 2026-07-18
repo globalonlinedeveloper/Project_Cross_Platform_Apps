@@ -19,7 +19,7 @@ jobs:
           channel: stable
       - run: flutter pub get
       - run: flutter analyze --no-fatal-infos
-      # - run: flutter test          # enable once widget tests are added
+      - run: flutter test
 
   backend:
     name: Worker typecheck

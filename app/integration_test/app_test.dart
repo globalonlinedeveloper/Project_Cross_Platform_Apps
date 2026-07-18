@@ -51,6 +51,39 @@ void main() {
 
   Future<void> shot(String name) => binding.takeScreenshot(name);
 
+  testWidgets('login rejects empty + invalid credentials with clear messages',
+      (WidgetTester tester) async {
+    await app.main();
+    await pumpFor(tester, const Duration(seconds: 3));
+
+    await tester.tap(find.text('Skip'));
+    await pumpFor(tester, const Duration(seconds: 2));
+    expect(find.text('Welcome back'), findsOneWidget);
+
+    // Fields must start EMPTY — no demo credentials shipped to users.
+    expect(find.text('alex@example.com'), findsNothing);
+    await shot('00a-login-empty');
+
+    // Empty submit → inline validation, no network round-trip.
+    await tester.tap(find.byKey(E2EKeys.loginSubmit));
+    await pumpFor(tester, const Duration(seconds: 1));
+    expect(find.textContaining('Enter your email'), findsWidgets);
+    await shot('00b-empty-validation');
+
+    // Wrong credentials → friendly message, stays on the login screen.
+    final int ts = DateTime.now().millisecondsSinceEpoch;
+    await tester.enterText(
+        find.byKey(E2EKeys.loginEmail), 'nobody-$ts@nikatru.com');
+    await tester.enterText(
+        find.byKey(E2EKeys.loginPassword), 'wrong-password-123');
+    await pumpFor(tester, const Duration(milliseconds: 300));
+    await tester.tap(find.byKey(E2EKeys.loginSubmit));
+    await pumpFor(tester, const Duration(seconds: 8));
+    expect(find.textContaining('Incorrect email or password'), findsWidgets);
+    expect(find.text('Welcome back'), findsOneWidget);
+    await shot('00c-invalid-credentials');
+  });
+
   testWidgets('visits every page, creates a subscription, reads it back',
       (WidgetTester tester) async {
     expect(email, isNotEmpty,
