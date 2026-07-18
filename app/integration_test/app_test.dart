@@ -285,8 +285,9 @@ void main() {
     await tester.scrollUntilVisible(find.text('Log out'), 200,
         scrollable: find.byType(Scrollable).first, maxScrolls: 20);
     await tester.tap(find.text('Log out'));
-    await pumpFor(tester, const Duration(seconds: 4));
-    expect(find.text('Skip'), findsOneWidget,
+    // signOut() is an async network round-trip to Supabase; the router then
+    // refreshes and rebuilds onboarding. Poll instead of racing a fixed pump.
+    expect(await waitFor(tester, find.text('Skip')), isTrue,
         reason: 'Sign-out did not return to the onboarding flow');
     await shot('17-signed-out');
   });
