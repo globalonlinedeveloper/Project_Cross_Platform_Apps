@@ -1,0 +1,9 @@
+# Normalize line endings so genuine corruption stands out instead of drowning in
+# CRLF-vs-LF noise (Windows host + Linux CI + sandbox clones all agree on LF).
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.ttf binary
+*.otf binary
