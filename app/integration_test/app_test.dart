@@ -49,6 +49,18 @@ void main() {
     }
   }
 
+  // Poll for a finder to appear — SnackBars auto-dismiss at 4s, so we assert
+  // the instant one shows instead of racing its timeout with a fixed pump.
+  Future<bool> waitFor(WidgetTester tester, Finder f,
+      {Duration timeout = const Duration(seconds: 12)}) async {
+    final DateTime end = DateTime.now().add(timeout);
+    while (DateTime.now().isBefore(end)) {
+      await tester.pump(const Duration(milliseconds: 200));
+      if (f.evaluate().isNotEmpty) return true;
+    }
+    return false;
+  }
+
   Future<void> shot(String name) => binding.takeScreenshot(name);
 
   testWidgets('login rejects empty + invalid credentials with clear messages',
@@ -66,8 +78,8 @@ void main() {
 
     // Empty submit → inline validation, no network round-trip.
     await tester.tap(find.byKey(E2EKeys.loginSubmit));
-    await pumpFor(tester, const Duration(seconds: 1));
-    expect(find.textContaining('Enter your email'), findsWidgets);
+    expect(await waitFor(tester, find.textContaining('Enter your email')), isTrue,
+        reason: 'empty-field validation message did not appear');
     await shot('00b-empty-validation');
 
     // Wrong credentials → friendly message, stays on the login screen.
@@ -78,8 +90,11 @@ void main() {
         find.byKey(E2EKeys.loginPassword), 'wrong-password-123');
     await pumpFor(tester, const Duration(milliseconds: 300));
     await tester.tap(find.byKey(E2EKeys.loginSubmit));
-    await pumpFor(tester, const Duration(seconds: 8));
-    expect(find.textContaining('Incorrect email or password'), findsWidgets);
+    expect(
+        await waitFor(
+            tester, find.textContaining('Incorrect email or password')),
+        isTrue,
+        reason: 'friendly invalid-credentials message did not appear');
     expect(find.text('Welcome back'), findsOneWidget);
     await shot('00c-invalid-credentials');
   });
@@ -156,7 +171,7 @@ void main() {
     await pumpFor(tester, const Duration(seconds: 2));
     expect(shellIndex(), 4);
     expect(find.byType(SettingsScreen), findsWidgets);
-    expect(find.text('Log out'), findsWidgets);
+    expect(find.text('CURRENCY'), findsWidgets);
     await shot('08-settings');
 
     // Back to Home for notifications + create.
@@ -204,10 +219,12 @@ void main() {
     // ── 12 Detail (subscription A) ───────────────────────────────────────────
     await tester.tap(subFinder.first);
     await pumpFor(tester, const Duration(seconds: 3));
-    expect(find.text('Payment history'), findsWidgets);
+    expect(find.text(subName), findsWidgets); // sub name shown in the detail header
     await shot('12-detail');
 
     // ── 13 Cancel/delete A (exercises DELETE /v1/subscriptions/:id) ───────────
+    await tester.scrollUntilVisible(find.text('Cancel plan'), 200,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 20);
     await tester.tap(find.text('Cancel plan'));
     await pumpFor(tester, const Duration(seconds: 2));
     expect(find.text('Confirm cancel'), findsOneWidget);
@@ -262,6 +279,8 @@ void main() {
     // ── 17 Sign out → back to onboarding ─────────────────────────────────────
     await tester.tap(find.text('More'));
     await pumpFor(tester, const Duration(seconds: 2));
+    await tester.scrollUntilVisible(find.text('Log out'), 200,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 20);
     await tester.tap(find.text('Log out'));
     await pumpFor(tester, const Duration(seconds: 4));
     expect(find.text('Skip'), findsOneWidget,
