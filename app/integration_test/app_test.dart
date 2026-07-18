@@ -180,10 +180,13 @@ void main() {
     expect(shellIndex(), 0);
 
     // ── 09 Notifications (bell on Home) ──────────────────────────────────────
+    expect(await waitFor(tester, find.byIcon(Icons.notifications_none_rounded)),
+        isTrue, reason: 'notifications bell did not render on Home');
     await tester.tap(find.byIcon(Icons.notifications_none_rounded));
     await pumpFor(tester, const Duration(seconds: 2));
     expect(find.text('Notifications'), findsWidgets);
     await shot('09-notifications');
+    expect(await waitFor(tester, find.byIcon(Icons.close)), isTrue);
     await tester.tap(find.byIcon(Icons.close));
     await pumpFor(tester, const Duration(seconds: 2));
     expect(shellIndex(), 0);
