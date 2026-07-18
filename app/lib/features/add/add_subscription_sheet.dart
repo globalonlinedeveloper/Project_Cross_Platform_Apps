@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/e2e_keys.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/models/subscription.dart';
@@ -125,7 +126,7 @@ class _AddSheetState extends ConsumerState<_AddSheet> {
               const SizedBox(height: 16),
               Text('NAME', style: AppText.label),
               const SizedBox(height: 6),
-              _input(_name, 'e.g. Hulu'),
+              _input(_name, 'e.g. Hulu', fieldKey: E2EKeys.addName),
               const SizedBox(height: 12),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,7 +139,8 @@ class _AddSheetState extends ConsumerState<_AddSheet> {
                         const SizedBox(height: 6),
                         _input(_price, '9.99',
                             keyboard:
-                                const TextInputType.numberWithOptions(decimal: true)),
+                                const TextInputType.numberWithOptions(decimal: true),
+                            fieldKey: E2EKeys.addPrice),
                       ],
                     ),
                   ),
@@ -168,6 +170,7 @@ class _AddSheetState extends ConsumerState<_AddSheet> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: GradientButton(
+                      key: E2EKeys.addSubmit,
                       label: _saving ? 'Adding…' : 'Add subscription',
                       onPressed: _saving ? null : _save,
                     ),
@@ -207,8 +210,9 @@ class _AddSheetState extends ConsumerState<_AddSheet> {
   }
 
   Widget _input(TextEditingController c, String hint,
-      {TextInputType keyboard = TextInputType.text}) {
+      {TextInputType keyboard = TextInputType.text, Key? fieldKey}) {
     return TextField(
+      key: fieldKey,
       controller: c,
       keyboardType: keyboard,
       style: AppText.body.copyWith(fontWeight: FontWeight.w600),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/e2e_keys.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../state/providers.dart';
@@ -100,9 +101,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 style: AppText.muted.copyWith(fontSize: 15),
               ),
               const SizedBox(height: 28),
-              _field('EMAIL', _email, TextInputType.emailAddress),
+              _field('EMAIL', _email, TextInputType.emailAddress,
+                  fieldKey: E2EKeys.loginEmail),
               const SizedBox(height: 14),
-              _field('PASSWORD', _password, TextInputType.text, obscure: true),
+              _field('PASSWORD', _password, TextInputType.text,
+                  obscure: true, fieldKey: E2EKeys.loginPassword),
               if (!_signUp)
                 Align(
                   alignment: Alignment.centerRight,
@@ -120,6 +123,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               const SizedBox(height: 12),
               GradientButton(
+                key: E2EKeys.loginSubmit,
                 label: _loading
                     ? 'Please wait…'
                     : (_signUp ? 'Create account' : 'Sign in'),
@@ -172,13 +176,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _field(String label, TextEditingController c, TextInputType type,
-      {bool obscure = false}) {
+      {bool obscure = false, Key? fieldKey}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(label, style: AppText.label),
         const SizedBox(height: 7),
         TextField(
+          key: fieldKey,
           controller: c,
           obscureText: obscure,
           keyboardType: type,

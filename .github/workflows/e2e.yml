@@ -1,0 +1,126 @@
+name: E2E (live)
+
+# Full-stack end-to-end test of the deployed Subly app against LIVE Supabase auth
+# + the live Cloudflare Worker + D1. A throwaway user is provisioned (confirmed)
+# before the run and purged after, so prod is left pristine.
+#
+# Runs nightly + on demand — NOT on every push (it writes to live prod and takes
+# a few minutes). To also run per-push, add `push: { branches: [main] }` below.
+#
+# Required repo secrets:
+#   SUPABASE_URL, SUPABASE_ANON_KEY, API_BASE_URL,
+#   CLOUDFLARE_API_TOKEN (needs D1 read+write), CLOUDFLARE_ACCOUNT_ID,
+#   SUPABASE_SERVICE_ROLE_KEY  <-- NEW: add this one to enable the job.
+# If SUPABASE_SERVICE_ROLE_KEY is absent the job green-skips (degrades gracefully).
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * *' # 03:17 UTC nightly
+
+jobs:
+  e2e:
+    name: Flutter integration_test (live Supabase + D1)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Preflight — is the service-role secret present?
+        id: pre
+        env:
+          KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=E2E skipped::SUPABASE_SERVICE_ROLE_KEY is not set — add it to enable the live E2E job."
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.pre.outputs.run == 'true'
+        with:
+          node-version: 20
+
+      - uses: subosito/flutter-action@v2
+        if: steps.pre.outputs.run == 'true'
+        with:
+          channel: stable
+
+      - name: Set up ChromeDriver
+        if: steps.pre.outputs.run == 'true'
+        uses: nanasess/setup-chromedriver@v2
+
+      - name: flutter pub get
+        if: steps.pre.outputs.run == 'true'
+        working-directory: app
+        run: flutter pub get
+
+      - name: Provision throwaway confirmed user
+        id: user
+        if: steps.pre.outputs.run == 'true'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node tool/e2e/provision_user.mjs
+
+      - name: Run integration tests (headless Chrome)
+        if: steps.pre.outputs.run == 'true'
+        working-directory: app
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          E2E_EMAIL: ${{ steps.user.outputs.email }}
+          E2E_PASSWORD: ${{ steps.user.outputs.password }}
+        run: |
+          set -euo pipefail
+          export CHROME_EXECUTABLE="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium-browser)"
+          echo "Chrome: $CHROME_EXECUTABLE"
+          chromedriver --port=4444 &
+          CHROMEDRIVER_PID=$!
+          sleep 3
+          flutter drive \
+            --driver=test_driver/integration_test.dart \
+            --target=integration_test/app_test.dart \
+            -d web-server --browser-name=chrome \
+            --web-browser-flag=--headless=new \
+            --web-browser-flag=--disable-gpu \
+            --web-browser-flag=--no-sandbox \
+            --web-browser-flag=--disable-dev-shm-usage \
+            --web-browser-flag=--window-size=430,932 \
+            --dart-define=SUPABASE_URL="$SUPABASE_URL" \
+            --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
+            --dart-define=API_BASE_URL="$API_BASE_URL" \
+            --dart-define=E2E_EMAIL="$E2E_EMAIL" \
+            --dart-define=E2E_PASSWORD="$E2E_PASSWORD"
+          kill "$CHROMEDRIVER_PID" || true
+
+      - name: Verify the row landed in live D1
+        if: steps.pre.outputs.run == 'true'
+        env:
+          E2E_USER_ID: ${{ steps.user.outputs.user_id }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          SUBLY_D1_DATABASE_ID: 88da9026-f72a-4cda-823d-431148fa8112
+        run: node tool/e2e/verify_row.mjs
+
+      - name: Upload per-page screenshots
+        if: always() && steps.pre.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-screenshots
+          path: app/screenshots/
+          if-no-files-found: warn
+
+      - name: Purge test data (always — keep prod pristine)
+        if: always() && steps.pre.outputs.run == 'true'
+        env:
+          E2E_USER_ID: ${{ steps.user.outputs.user_id }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          SUBLY_D1_DATABASE_ID: 88da9026-f72a-4cda-823d-431148fa8112
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node tool/e2e/purge.mjs

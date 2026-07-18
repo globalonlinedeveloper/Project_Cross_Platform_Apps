@@ -40,6 +40,12 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  # Drives the real widget tree in a browser for the live E2E suite
+  # (integration_test/). Works regardless of the web renderer (canvas).
+  integration_test:
+    sdk: flutter
+
   flutter_lints: ^4.0.0
 
 flutter:

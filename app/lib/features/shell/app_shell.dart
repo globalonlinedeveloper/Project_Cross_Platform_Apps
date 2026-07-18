@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/e2e_keys.dart';
 import '../../core/theme/app_colors.dart';
 import '../add/add_subscription_sheet.dart';
 import '../shared/widgets.dart';
@@ -51,6 +52,7 @@ class AppShell extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
+                key: E2EKeys.fabAdd,
                 borderRadius: BorderRadius.circular(18),
                 onTap: () => showAddSubscriptionSheet(context),
                 child: Container(
