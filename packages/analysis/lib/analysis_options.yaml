@@ -1,0 +1,19 @@
+# Nikatru portfolio baseline lints.
+# Mirrors app/analysis_options.yaml — the proven Subly config (strict-casts on;
+# prefer_const_constructors intentionally off, see the Subly template note).
+#
+# Usage from any package/app:
+#   include: package:nikatru_lints/analysis_options.yaml
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    prefer_final_locals: true
+    avoid_print: true
+
+analyzer:
+  language:
+    strict-casts: true
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"

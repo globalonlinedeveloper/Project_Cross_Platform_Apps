@@ -1,0 +1,30 @@
+name: nikatru_workspace
+description: >-
+  Nikatru Cross Platform Apps — monorepo workspace root (Dart pub workspaces +
+  Melos 8). Members: shared packages under packages/. The Subly app (app/)
+  stays a standalone package until P0.6 relocates it to apps/subly.
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+
+# Workspace members — explicit paths (Melos 8 docs: no globs here yet).
+workspace:
+  - packages/analysis
+
+dev_dependencies:
+  melos: ^8.2.2
+
+# Melos 7+/8 configuration lives here (melos.yaml no longer exists).
+melos:
+  scripts:
+    analyze:
+      run: melos exec --fail-fast -- dart analyze --fatal-infos .
+      description: >-
+        Analyze every workspace package. Pure-Dart packages only for now;
+        the Subly app keeps its own CI lane until P0.8 unifies the gate.
+    test:
+      run: melos exec --fail-fast --dir-exists=test -- dart test
+      description: >-
+        Run tests in every workspace package that has a test/ directory
+        (first such package lands with P0.3).

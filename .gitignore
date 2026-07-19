@@ -47,3 +47,13 @@ Thumbs.db
 # ── Internal planning docs (kept OUT of the public repo, owner's choice) ──
 /Backend Research - Firebase vs Cloudflare (July 2026).md
 /Subscription tracker app design/
+
+# ── Pub workspace root artifacts (member packages resolve at the root) ──
+/.dart_tool/
+/pubspec.lock
+packages/**/.dart_tool/
+packages/**/pubspec.lock
+
+# ── Melos bootstrap IDE output ──
+/.idea/
+*.iml

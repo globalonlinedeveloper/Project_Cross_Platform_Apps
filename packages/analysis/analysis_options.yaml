@@ -1,0 +1,2 @@
+# Self-apply the shared options (relative include — resolves without pub get).
+include: lib/analysis_options.yaml
