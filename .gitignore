@@ -57,3 +57,6 @@ packages/**/pubspec.lock
 # ── Melos bootstrap IDE output ──
 /.idea/
 *.iml
+
+# ── Internal analysis docs (strategy — never commit plaintext; git-crypt first if tracking is wanted) ──
+/NIKATRU_GAP_ANALYSIS*.md
