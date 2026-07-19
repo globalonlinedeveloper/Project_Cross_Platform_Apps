@@ -45,6 +45,5 @@ Thumbs.db
 .vscode/
 
 # ── Internal planning docs (kept OUT of the public repo, owner's choice) ──
-/PROJECT_STATE.md
 /Backend Research - Firebase vs Cloudflare (July 2026).md
 /Subscription tracker app design/

@@ -7,3 +7,7 @@
 *.ico binary
 *.ttf binary
 *.otf binary
+
+# git-crypt: encrypt private strategy docs (-text exempts them from global eol=lf so ciphertext round-trips byte-exact)
+NIKATRU_MASTER_REQUIREMENTS.md filter=git-crypt diff=git-crypt -text
+PROJECT_STATE.md filter=git-crypt diff=git-crypt -text
