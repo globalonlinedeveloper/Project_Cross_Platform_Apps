@@ -8,7 +8,7 @@
 //
 // SETUP (one time, in the Cloudflare dashboard):
 //   1. Workers & Pages -> KV -> Create namespace, e.g. "nikatru-signups".
-//   2. Pages project "project-nek" -> Settings -> Functions ->
+//   2. Pages project "nikatru" -> Settings -> Functions ->
 //      KV namespace bindings -> Add binding:
 //         Variable name: SIGNUPS
 //         KV namespace:  nikatru-signups
