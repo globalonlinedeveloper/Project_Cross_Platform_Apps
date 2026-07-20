@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIKATRU &mdash; Apps for every screen</title>
+<meta name="description" content="NIKATRU is an independent app studio in Chennai, India, building privacy-first apps for iOS, Android, Windows, macOS, Linux and the web. First releases on the way.">
+<link rel="canonical" href="https://nikatru.com/">
+<meta name="theme-color" content="#0B1220">
+<meta property="og:title" content="NIKATRU &mdash; Apps for every screen">
+<meta property="og:description" content="Independent app studio publishing privacy-first apps across iOS, Android, Windows, macOS, Linux and the web.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NIKATRU">
+<meta property="og:url" content="https://nikatru.com/">
+<meta property="og:image" content="https://nikatru.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NIKATRU &mdash; Apps for every screen. iOS, Android, Windows, macOS, Linux and Web.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="NIKATRU &mdash; Apps for every screen">
+<meta name="twitter:description" content="Independent app studio publishing privacy-first apps across iOS, Android, Windows, macOS, Linux and the web.">
+<meta name="twitter:image" content="https://nikatru.com/og-image.png">
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="m" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="%232E6FF2"/><stop offset="1" stop-color="%2317C3A2"/></linearGradient></defs><rect width="1024" height="1024" rx="226" fill="%230B1220"/><path d="M 292 720 L 292 304 L 656 720 L 656 304 M 580 380 L 656 304 L 732 380" fill="none" stroke="url(%23m)" stroke-width="118" stroke-linecap="round" stroke-linejoin="round"/></svg>'>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
+<link rel="manifest" href="/site.webmanifest">
+<style>
+  :root{
+    --brand-ink:#0B1220; --ink-2:#111C33; --primary:#2E6FF2; --teal:#17C3A2;
+    --bg:#F6F8FC; --card:#FFFFFF; --card-2:#F8FAFD;
+    --text:#334155; --strong:#0B1220; --muted:#586275;
+    --line:#E2E8F0; --radius:16px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0B1220; --card:#111C33; --card-2:#0E1830;
+      --text:#C7D2E3; --strong:#F1F5F9; --muted:#93A1BC;
+      --line:#22304D;
+    }
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:84px}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  a{color:var(--primary)}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+  /* Skip link */
+  .skip{position:absolute;left:12px;top:-48px;z-index:200;background:var(--primary);color:#fff;
+    padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:600;transition:top .2s}
+  .skip:focus{top:12px}
+
+  :focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:6px}
+
+  /* Nav */
+  nav{position:sticky;top:0;z-index:50;background:rgba(11,18,32,.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.06)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+  .brand svg{width:36px;height:36px;flex:none}
+  .brand span{color:#fff;font-weight:800;letter-spacing:.14em;font-size:17px}
+  .nav-right{display:flex;align-items:center;gap:20px}
+  .nav-links{display:flex;gap:26px}
+  .nav-links a{color:#B6C2D9;text-decoration:none;font-size:14.5px;font-weight:500}
+  .nav-links a:hover{color:#fff}
+  .nav-cta{display:inline-flex;align-items:center;background:linear-gradient(90deg,var(--primary),var(--teal));
+    color:#fff;text-decoration:none;font-weight:700;font-size:14px;padding:9px 18px;border-radius:10px;white-space:nowrap}
+  .nav-cta:hover{filter:brightness(1.08)}
+  .nav-toggle{display:none;flex-direction:column;justify-content:center;gap:5px;width:44px;height:44px;padding:11px;margin:0;background:transparent;border:0;cursor:pointer;border-radius:10px}
+  .nav-toggle:hover{background:rgba(255,255,255,.06)}
+  .nav-toggle .bar{display:block;width:22px;height:2px;background:#DCE4F1;border-radius:2px;transition:transform .25s ease,opacity .2s ease}
+  .nav-toggle[aria-expanded="true"] .bar:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .nav-toggle[aria-expanded="true"] .bar:nth-child(2){opacity:0}
+  .nav-toggle[aria-expanded="true"] .bar:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+  /* Hero */
+  header{background:linear-gradient(180deg,#0E1830 0%,#0B1220 100%);color:#fff;padding:92px 0 84px;text-align:center}
+  .eyebrow{display:inline-block;font-weight:800;font-size:13px;letter-spacing:.3em;margin-bottom:16px;background:linear-gradient(90deg,#5B93FF,#25E0BC);-webkit-background-clip:text;background-clip:text;color:transparent}
+  h1{font-size:clamp(34px,5.5vw,58px);font-weight:800;letter-spacing:-.02em;line-height:1.12;color:#fff}
+  h1 .grad{background:linear-gradient(90deg,#5B93FF,#25E0BC);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{max-width:660px;margin:20px auto 0;color:#A9B7CE;font-size:18px}
+  .trust{display:flex;flex-wrap:wrap;gap:10px 14px;justify-content:center;align-items:center;margin:26px auto 0;color:#C4D0E4;font-size:13.5px;font-weight:600}
+  .trust .sep{color:#3F5478}
+  .cta-row{display:flex;flex-wrap:wrap;gap:14px 20px;justify-content:center;align-items:center;margin-top:34px}
+  .cta{display:inline-flex;align-items:center;background:linear-gradient(90deg,var(--primary),var(--teal));color:#fff;text-decoration:none;font-weight:700;padding:14px 32px;border-radius:12px;font-size:16px}
+  .cta:hover{filter:brightness(1.08)}
+  .cta-2{color:#CFDBF0;text-decoration:none;font-weight:600;font-size:15.5px;border-bottom:1px solid rgba(207,219,240,.3);padding-bottom:2px}
+  .cta-2:hover{color:#fff;border-color:#fff}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:40px}
+  .chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:8px 16px;font-size:13.5px;color:#D7E0EF}
+  .dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(90deg,var(--primary),var(--teal))}
+
+  /* Sections */
+  section{padding:80px 0}
+  h2{font-size:31px;font-weight:800;letter-spacing:-.01em;color:var(--strong);text-align:center}
+  .section-sub{text-align:center;color:var(--muted);margin:12px auto 46px;max-width:600px;font-size:16.5px}
+
+  /* Cards grid (What we're building) */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:28px;display:flex;flex-direction:column;gap:14px;transition:box-shadow .2s,transform .2s}
+  .card:hover{box-shadow:0 12px 32px rgba(11,18,32,.10);transform:translateY(-2px)}
+  .card-ico{width:50px;height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,rgba(46,111,242,.14),rgba(23,195,162,.14));color:var(--primary);flex:none}
+  .card-ico svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .card h3{font-size:18.5px;color:var(--strong);font-weight:700}
+  .card p{color:var(--muted);font-size:15.5px}
+  .tag{align-self:flex-start;margin-top:auto;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--teal);background:rgba(23,195,162,.12);border:1px solid rgba(23,195,162,.3);padding:5px 11px;border-radius:999px}
+
+  /* Apps grid (populated only when APPS has entries) */
+  .app-head{display:flex;align-items:center;gap:14px}
+  .app-icon{width:56px;height:56px;border-radius:14px;background:var(--brand-ink);display:flex;align-items:center;justify-content:center;font-size:28px;flex:none;overflow:hidden}
+  .app-icon img{width:100%;height:100%;object-fit:cover}
+  .app-name{font-weight:700;font-size:18px;color:var(--strong)}
+  .app-tag{color:var(--muted);font-size:14.5px}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto}
+  .badge{display:inline-block;font-size:12.5px;font-weight:600;text-decoration:none;padding:6px 12px;border-radius:8px;border:1px solid var(--line);color:var(--strong);background:var(--card-2)}
+  .badge:hover{border-color:var(--primary);color:var(--primary)}
+  .badge.soon{background:rgba(245,217,168,.16);border-color:#F5D9A8;color:#B4802A;cursor:default}
+
+  /* Platforms band */
+  .platforms{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .plat-row{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-bottom:52px}
+  .plat{display:flex;flex-direction:column;align-items:center;gap:10px;width:118px;padding:20px 10px;border:1px solid var(--line);border-radius:14px;background:var(--card-2)}
+  .plat svg{width:30px;height:30px;fill:none;stroke:var(--strong);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .plat span{font-size:14px;font-weight:600;color:var(--text)}
+  .values{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:26px;max-width:900px;margin:0 auto}
+  .value{text-align:center;padding:0 6px}
+  .value .v-ico{width:52px;height:52px;margin:0 auto 14px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,rgba(46,111,242,.14),rgba(23,195,162,.14));color:var(--primary)}
+  .value .v-ico svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .value h3{font-size:18px;color:var(--strong);font-weight:700;margin-bottom:6px}
+  .value p{color:var(--muted);font-size:15.5px}
+
+  /* Developer */
+  .dev-in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:32px;flex-wrap:wrap;justify-content:center;text-align:left}
+  .dev-photo{width:150px;height:192px;border-radius:18px;object-fit:cover;flex:none;border:3px solid var(--card);box-shadow:0 8px 26px rgba(11,18,32,.18)}
+  .dev-copy{flex:1;min-width:260px}
+  .dev-copy h2{text-align:left}
+  .dev-copy p{color:var(--muted);font-size:16.5px;margin-top:14px}
+  .dev-link{display:inline-block;margin-top:18px;color:var(--primary);text-decoration:none;font-weight:600;border-bottom:1px solid rgba(46,111,242,.35)}
+  .dev-link:hover{border-color:var(--primary)}
+
+  /* Notify band */
+  .notify{background:linear-gradient(180deg,#0E1830 0%,#0B1220 100%);color:#fff;text-align:center}
+  .notify h2{color:#fff}
+  .notify .section-sub{color:#A9B7CE}
+  .notify-form{display:flex;gap:10px;max-width:480px;margin:0 auto;flex-wrap:wrap;justify-content:center}
+  .notify-form input[type="email"]{flex:1;min-width:220px;padding:14px 18px;border-radius:12px;border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.06);color:#fff;font-size:16px}
+  .notify-form input[type="email"]::placeholder{color:#8296B4}
+  .notify-form input[type="email"]:focus{outline:2px solid var(--primary);outline-offset:1px;border-color:transparent}
+  .notify-form button{background:linear-gradient(90deg,var(--primary),var(--teal));color:#fff;border:0;font-weight:700;
+    font-size:16px;padding:14px 28px;border-radius:12px;cursor:pointer}
+  .notify-form button:hover{filter:brightness(1.08)}
+  .notify-form button:disabled{opacity:.6;cursor:default}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+  .notify-note{margin-top:16px;color:#7F92B1;font-size:13px}
+  .notify-msg{margin-top:14px;font-size:14.5px;font-weight:600;min-height:1.2em}
+  .notify-msg.ok{color:#25E0BC}
+  .notify-msg.err{color:#FF9BA6}
+
+  /* Footer */
+  footer{background:var(--brand-ink);color:#8FA0BC;text-align:center;padding:34px 24px;font-size:13.5px}
+  footer b{color:#fff}
+  footer a{color:#B6C2D9;text-decoration:none}
+  footer a:hover{color:#fff}
+  .foot-links{margin:0 0 18px;display:flex;gap:8px 20px;flex-wrap:wrap;justify-content:center}
+  .foot-dev{display:inline-block;margin-top:14px}
+
+  @media(max-width:720px){
+    .nav-toggle{display:flex}
+    .nav-links{position:absolute;top:64px;left:0;right:0;flex-direction:column;gap:0;background:rgba(11,18,32,.98);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.08);max-height:0;overflow:hidden;transition:max-height .28s ease}
+    .nav-links.open{max-height:240px}
+    .nav-links a{padding:15px 24px;font-size:16px;border-top:1px solid rgba(255,255,255,.06)}
+    .dev-in{text-align:center}
+    .dev-copy h2{text-align:center}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important;animation:none!important}}
+
+  /* ---- Hero aurora glow (GPU-friendly transform/opacity; disabled for reduced-motion) ---- */
+  header{position:relative;overflow:hidden}
+  header .wrap{position:relative;z-index:1}
+  .aurora{position:absolute;inset:-25% -10% 0;z-index:0;pointer-events:none;filter:blur(72px);opacity:.5}
+  .aurora::before,.aurora::after{content:"";position:absolute;width:48%;height:72%;border-radius:50%}
+  .aurora::before{left:5%;top:-4%;background:radial-gradient(circle,#2E6FF2,transparent 68%);animation:drift1 20s ease-in-out infinite alternate}
+  .aurora::after{right:3%;top:10%;background:radial-gradient(circle,#17C3A2,transparent 68%);animation:drift2 24s ease-in-out infinite alternate}
+  @keyframes drift1{from{transform:translate3d(-5%,-3%,0) scale(1)}to{transform:translate3d(9%,7%,0) scale(1.18)}}
+  @keyframes drift2{from{transform:translate3d(5%,2%,0) scale(1.12)}to{transform:translate3d(-9%,-6%,0) scale(1)}}
+
+  /* ---- Hero inline email capture ---- */
+  .hero-form{margin:30px auto 0}
+  .cta-alt{margin-top:16px}
+  .hero-note{margin:14px auto 0;max-width:480px;color:#8FA0BC;font-size:13.5px}
+  .hero-msg{max-width:480px;margin-left:auto;margin-right:auto}
+
+  /* ---- Bento layout for "What we're building" ---- */
+  .bento{display:grid;grid-template-columns:repeat(6,1fr);gap:18px}
+  .bento>.card{margin:0}
+  .b-a{grid-column:span 4}
+  .b-b{grid-column:span 2}
+  .b-c{grid-column:span 6}
+  .card.wide{flex-direction:row;align-items:flex-start;gap:22px}
+  .card.wide .card-body{display:flex;flex-direction:column;gap:10px}
+  @media(max-width:860px){
+    .bento{grid-template-columns:1fr}
+    .bento>.card{grid-column:auto}
+    .card.wide{flex-direction:column;gap:14px}
+  }
+
+  /* ---- Card hover accent bar + brand-tinted lift ---- */
+  .card{position:relative;overflow:hidden}
+  .card::after{content:"";position:absolute;left:0;right:0;top:0;height:3px;
+    background:linear-gradient(90deg,var(--primary),var(--teal));opacity:0;transition:opacity .25s ease}
+  .card:hover::after{opacity:1}
+  .card:hover{box-shadow:0 16px 40px rgba(46,111,242,.14);transform:translateY(-3px);border-color:rgba(46,111,242,.35)}
+
+  /* ---- Scroll reveal (class added by JS, so no-JS users still see everything) ---- */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://nikatru.com/#org",
+      "name": "NIKATRU",
+      "alternateName": "Nikatru App Studio",
+      "url": "https://nikatru.com/",
+      "logo": "https://nikatru.com/icon-512.png",
+      "image": "https://nikatru.com/og-image.png",
+      "slogan": "Apps for every screen.",
+      "description": "Independent app studio in Chennai, India, building privacy-first apps for iOS, Android, Windows, macOS, Linux and the web.",
+      "foundingDate": "2021",
+      "foundingLocation": { "@type": "Place", "address": { "@type": "PostalAddress", "addressLocality": "Chennai", "addressRegion": "Tamil Nadu", "addressCountry": "IN" } },
+      "knowsAbout": ["Cross-platform app development", "iOS apps", "Android apps", "Windows apps", "macOS apps", "Linux apps", "Web apps", "Privacy-first software"],
+      "email": "support@nikatru.com",
+      "founder": { "@type": "Person", "@id": "https://rajasekarselvam.com/#person", "name": "Rajasekar Selvam", "url": "https://rajasekarselvam.com/" },
+      "sameAs": ["https://rajasekarselvam.com/"],
+      "address": { "@type": "PostalAddress", "addressLocality": "Chennai", "addressRegion": "Tamil Nadu", "addressCountry": "IN" },
+      "contactPoint": { "@type": "ContactPoint", "email": "support@nikatru.com", "contactType": "customer support" }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://nikatru.com/#website",
+      "url": "https://nikatru.com/",
+      "name": "NIKATRU",
+      "description": "Apps for every screen - iOS, Android, Windows, macOS, Linux and Web.",
+      "inLanguage": "en",
+      "publisher": { "@id": "https://nikatru.com/#org" }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="brand" href="#top" aria-label="NIKATRU home">
+      <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="nm" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stop-color="#2E6FF2"/><stop offset="1" stop-color="#17C3A2"/>
+        </linearGradient></defs>
+        <rect width="1024" height="1024" rx="226" fill="#111C33"/>
+        <path d="M 292 720 L 292 304 L 656 720 L 656 304 M 580 380 L 656 304 L 732 380" fill="none" stroke="url(#nm)"
+              stroke-width="118" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>NIKATRU</span>
+    </a>
+    <div class="nav-right">
+      <div class="nav-links" id="navLinks">
+        <a href="#apps">What we're building</a>
+        <a href="#platforms">Platforms</a>
+        <a href="#developer">Developer</a>
+      </div>
+      <a class="nav-cta" href="#notify">Notify me</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<header id="top">
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="wrap">
+    <p class="eyebrow">NIKATRU&trade;</p>
+    <h1>Apps for <span class="grad">every screen</span>.</h1>
+    <p class="sub">NIKATRU is an independent app studio in Chennai, India &mdash; building polished,
+    privacy-first apps for iOS, Android, Windows, macOS, Linux and the web. Our first releases are on the way.</p>
+    <p class="trust">
+      Est. 2021 <span class="sep" aria-hidden="true">&middot;</span>
+      Registered MSME <span class="sep" aria-hidden="true">&middot;</span>
+      6 platforms <span class="sep" aria-hidden="true">&middot;</span>
+      Privacy-first
+    </p>
+    <form id="hero-form" class="notify-form hero-form" action="/api/subscribe" method="POST" novalidate>
+      <label class="sr-only" for="hero-email">Email address</label>
+      <input id="hero-email" name="email" type="email" required autocomplete="email"
+             inputmode="email" placeholder="you@example.com">
+      <input type="text" name="company" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button type="submit">Get early access</button>
+    </form>
+    <p class="hero-note">Join the launch list &mdash; be first when our apps ship in 2026. No spam, unsubscribe anytime.</p>
+    <p class="notify-msg hero-msg" role="status" aria-live="polite"></p>
+    <p class="cta-alt"><a class="cta-2" href="#developer">Meet the developer &rarr;</a></p>
+    <div class="chips" aria-label="Supported platforms">
+      <span class="chip"><span class="dot"></span>iOS</span>
+      <span class="chip"><span class="dot"></span>Android</span>
+      <span class="chip"><span class="dot"></span>Windows</span>
+      <span class="chip"><span class="dot"></span>macOS</span>
+      <span class="chip"><span class="dot"></span>Linux</span>
+      <span class="chip"><span class="dot"></span>Web</span>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+<section id="apps">
+  <div class="wrap">
+    <h2>What we're building</h2>
+    <p class="section-sub">Real products, in the open. Here's the honest picture while we build toward our first launch.</p>
+    <div class="bento" id="value-grid">
+      <div class="card b-a">
+        <div class="card-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/></svg>
+        </div>
+        <h3>Cross-platform apps</h3>
+        <p>Everyday tools and games that feel native on your phone, your computer and the web &mdash;
+        not watered-down ports.</p>
+        <span class="tag">In development</span>
+      </div>
+      <div class="card b-b">
+        <div class="card-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        </div>
+        <h3>Privacy-first by design</h3>
+        <p>No tracking, no ads, no selling your data. Apps that do their job and respect your information.</p>
+        <span class="tag">Core principle</span>
+      </div>
+      <div class="card wide b-c">
+        <div class="card-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 3l2.2 5.4L20 10l-5.8 1.6L12 17l-2.2-5.4L4 10l5.8-1.6z"/></svg>
+        </div>
+        <div class="card-body">
+          <h3>Built for the long run</h3>
+          <p>Careful design and steady updates. Software we intend to support &mdash; not abandon after launch.</p>
+          <span class="tag">Our commitment</span>
+        </div>
+      </div>
+    </div>
+    <div class="grid" id="apps-grid" hidden></div>
+  </div>
+</section>
+
+<section id="platforms" class="platforms">
+  <div class="wrap">
+    <h2>One craft, every platform</h2>
+    <p class="section-sub">The same care goes into every version, so NIKATRU apps feel at home wherever you run them.</p>
+    <div class="plat-row" aria-label="Platforms we build for">
+      <div class="plat"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2.5"/><line x1="10.5" y1="18.5" x2="13.5" y2="18.5"/></svg><span>iOS</span></div>
+      <div class="plat"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2.5"/><line x1="10" y1="5" x2="14" y2="5"/></svg><span>Android</span></div>
+      <div class="plat"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="15" rx="2"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="12" y1="9.5" x2="12" y2="19"/></svg><span>Windows</span></div>
+      <div class="plat"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1.5"/><line x1="2" y1="20" x2="22" y2="20"/></svg><span>macOS</span></div>
+      <div class="plat"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><polyline points="7 9 10 12 7 15"/><line x1="12" y1="15" x2="16.5" y2="15"/></svg><span>Linux</span></div>
+      <div class="plat"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span>Web</span></div>
+    </div>
+    <div class="values">
+      <div class="value">
+        <div class="v-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></div>
+        <h3>Native</h3>
+        <p>Each build is tuned to its platform, so it looks and feels right at home.</p>
+      </div>
+      <div class="value">
+        <div class="v-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+        <h3>Private</h3>
+        <p>No trackers or ads. Your data stays on your device and in your hands.</p>
+      </div>
+      <div class="value">
+        <div class="v-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l2.2 5.4L20 10l-5.8 1.6L12 17l-2.2-5.4L4 10l5.8-1.6z"/></svg></div>
+        <h3>Polished</h3>
+        <p>Thoughtful details and regular updates, from the first release onward.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="developer">
+  <div class="wrap">
+    <div class="dev-in">
+      <picture>
+        <source srcset="/founder-v4.webp" type="image/webp">
+        <img class="dev-photo" src="/founder-v4.jpg" width="150" height="192" loading="lazy"
+             alt="Rajasekar Selvam, founder of NIKATRU">
+      </picture>
+      <div class="dev-copy">
+        <h2>The person behind NIKATRU</h2>
+        <p>NIKATRU is the studio of <a href="https://rajasekarselvam.com" target="_blank" rel="noopener"><b>Rajasekar Selvam</b></a>, a Chennai-based developer with 11+ years in software. It started in 2021
+        with a simple goal: make well-crafted, privacy-respecting apps that work on every screen &mdash; and
+        stand behind them for the long haul.</p>
+        <a class="dev-link" href="contact.html">Get in touch &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="notify" class="notify">
+  <div class="wrap">
+    <h2>Get notified at launch</h2>
+    <p class="section-sub">Be the first to know when our first apps ship. Occasional launch news only &mdash;
+    no spam, and you can unsubscribe anytime.</p>
+    <form id="notify-form" class="notify-form" action="/api/subscribe" method="POST" novalidate>
+      <label class="sr-only" for="notify-email">Email address</label>
+      <input id="notify-email" name="email" type="email" required autocomplete="email"
+             inputmode="email" placeholder="you@example.com">
+      <input type="text" name="company" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button type="submit" id="notify-btn">Notify me</button>
+    </form>
+    <p class="notify-note">We store your email only to email you at launch. Nothing else, ever.</p>
+    <p id="notify-msg" class="notify-msg" role="status" aria-live="polite"></p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-links">
+      <a href="/">Home</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms</a>
+      <a href="refund.html">Refunds</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <b>NIKATRU&trade;</b> &middot; Chennai, Tamil Nadu, India<br>
+    Registered MSME &middot; UDYAM-TN-02-0487004<br>
+    <span class="foot-dev">Developed by <a href="https://rajasekarselvam.com" target="_blank" rel="noopener"><b>Rajasekar Selvam</b></a></span><br>
+    &copy; 2026 NIKATRU. All rights reserved.
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   YOUR APPS - add one object per published app.
+   Any store link you leave out simply won't show a button.
+   When APPS has entries, the value cards above are replaced
+   by the real apps grid automatically.
+   Example:
+   {
+     name: "My Notes App",
+     tagline: "Fast, offline-first notes.",
+     icon: "&#128241;",           // emoji, or "img/mynotes.png"
+     links: {
+       ios:     "https://apps.apple.com/app/id0000000000",
+       android: "https://play.google.com/store/apps/details?id=com.nikatru.notes",
+       windows: "https://apps.microsoft.com/detail/XXXXXXXX",
+       macos:   "https://apps.apple.com/app/id0000000000",
+       linux:   "https://flathub.org/apps/com.nikatru.notes",
+       web:     "https://notes.nikatru.com"
+     }
+   }
+   ============================================================ */
+const APPS = [
+  // add your first app here
+];
+
+const STORE_LABELS = {
+  ios: "App Store", android: "Google Play", windows: "Microsoft Store",
+  macos: "Mac App Store", linux: "Snap / Flathub", web: "Web App"
+};
+
+(function(){
+  if (!APPS.length) return;                 // keep the honest value cards until real apps exist
+  const valueGrid = document.getElementById("value-grid");
+  const grid = document.getElementById("apps-grid");
+  if (valueGrid) valueGrid.hidden = true;
+  if (!grid) return;
+  grid.hidden = false;
+  grid.innerHTML = APPS.map(app => {
+    const icon = app.icon && app.icon.includes(".")
+      ? `<img src="${app.icon}" alt="${app.name} icon">` : (app.icon || "&#128241;");
+    const links = app.links || {};
+    const badges = Object.keys(STORE_LABELS)
+      .filter(k => links[k])
+      .map(k => `<a class="badge" target="_blank" rel="noopener" href="${links[k]}">${STORE_LABELS[k]}</a>`)
+      .join("");
+    return `<div class="card">
+      <div class="app-head">
+        <div class="app-icon">${icon}</div>
+        <div><div class="app-name">${app.name}</div></div>
+      </div>
+      <div class="app-tag">${app.tagline || ""}</div>
+      <div class="badges">${badges || '<span class="badge soon">Coming soon</span>'}</div>
+    </div>`;
+  }).join("");
+})();
+
+/* ---- Mobile nav toggle ---- */
+(function(){
+  const btn = document.getElementById("navToggle");
+  const menu = document.getElementById("navLinks");
+  if (!btn || !menu) return;
+  const setOpen = (open) => {
+    menu.classList.toggle("open", open);
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    btn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  };
+  btn.addEventListener("click", () => setOpen(!menu.classList.contains("open")));
+  menu.querySelectorAll("a").forEach(a => a.addEventListener("click", () => setOpen(false)));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
+})();
+
+/* ---- Notify forms (hero + footer capture, same endpoint) ---- */
+(function(){
+  const forms = document.querySelectorAll("form.notify-form");
+  const valid = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) && e.length <= 254;
+  forms.forEach((form) => {
+    const btn = form.querySelector("button[type=submit]") || form.querySelector("button");
+    const input = form.querySelector("input[type=email]");
+    const wrap = form.closest(".wrap") || form.parentElement;
+    const msg = wrap ? wrap.querySelector(".notify-msg") : null;
+    if (!btn || !input) return;
+    const show = (t, kind) => { if (msg) { msg.textContent = t; msg.className = "notify-msg " + kind; } };
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = (input.value || "").trim();
+      if (!valid(email)) { show("Please enter a valid email address.", "err"); input.focus(); return; }
+      const original = btn.textContent;
+      btn.disabled = true; btn.textContent = "Sending...";
+      try {
+        const res = await fetch("/api/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email, company: (form.company ? form.company.value : "") })
+        });
+        let data = {};
+        try { data = await res.json(); } catch (_) {}
+        if (res.ok && data.ok) { form.reset(); show("You're on the list. We'll email you at launch.", "ok"); }
+        else { show((data && data.error) || "Something went wrong. Please try again.", "err"); }
+      } catch (_) {
+        show("Network error. Please try again.", "err");
+      } finally {
+        btn.disabled = false; btn.textContent = original;
+      }
+    });
+  });
+})();
+
+/* ---- Scroll reveal (progressive enhancement; no-JS users see everything) ---- */
+(function(){
+  if (!("IntersectionObserver" in window)) return;
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const els = document.querySelectorAll(".card, .value, .plat, .dev-in");
+  if (!els.length) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+    });
+  }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+  els.forEach((el) => { el.classList.add("reveal"); io.observe(el); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     PER-APP DETAIL PAGE — TEMPLATE (not linked, noindex).
+     To launch an app page:
+       1. Copy this file to  apps/<slug>.html  (e.g. apps/notes.html)
+       2. Replace every [PLACEHOLDER], incl. the JSON-LD block
+       3. Add real screenshots to  apps/shots/<slug>-1.webp  etc.
+       4. Remove the noindex meta + set the canonical URL
+       5. Add the page to sitemap.xml
+       6. Add the app to the APPS array in index.html
+          (links.web can point to this page or the live web app)
+     ============================================================ -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow"><!-- REMOVE when page is real -->
+<title>[APP NAME] &mdash; NIKATRU</title>
+<meta name="description" content="[One-sentence app description — what it does and for whom.]">
+<link rel="canonical" href="https://nikatru.com/apps/[SLUG].html">
+<meta name="theme-color" content="#0B1220">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
+<link rel="manifest" href="/site.webmanifest">
+<style>
+  :root{--ink:#0B1220;--primary:#2E6FF2;--teal:#17C3A2;--bg:#F6F8FC;--card:#FFFFFF;--text:#1E293B;--strong:#0B1220;--muted:#586275;--line:#E2E8F0;--soft:#F6F8FC;--radius:16px}
+  @media (prefers-color-scheme: dark){
+    :root{--bg:#0B1220;--card:#111C33;--text:#C7D2E3;--strong:#F1F5F9;--muted:#93A1BC;--line:#22304D;--soft:#0E1830}
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.65}
+  .wrap{max-width:880px;margin:0 auto;padding:0 24px}
+  :focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:6px}
+  nav{background:rgba(11,18,32,.96);position:sticky;top:0;z-index:10;border-bottom:1px solid rgba(255,255,255,.06)}
+  .nav-in{max-width:880px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .brand svg{width:30px;height:30px}
+  .brand span{color:#fff;font-weight:800;letter-spacing:.14em;font-size:15px}
+  a.back{color:#B6C2D9;text-decoration:none;font-size:14px}
+  a.back:hover{color:#fff}
+  header{background:linear-gradient(180deg,#0E1830 0%,#0B1220 100%);color:#fff;padding:64px 0}
+  .app-hero{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+  .app-icon{width:96px;height:96px;border-radius:22px;background:#111C33;overflow:hidden;flex:none;display:flex;align-items:center;justify-content:center;font-size:44px}
+  .app-icon img{width:100%;height:100%;object-fit:cover}
+  h1{font-size:clamp(28px,4.5vw,40px);font-weight:800;letter-spacing:-.02em}
+  .tagline{color:#A9B7CE;font-size:17.5px;margin-top:8px;max-width:560px}
+  .stores{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+  .store{display:inline-flex;align-items:center;text-decoration:none;font-weight:700;font-size:14px;padding:11px 20px;border-radius:11px;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.16)}
+  .store:hover{background:rgba(255,255,255,.15)}
+  .store.primary{background:linear-gradient(90deg,var(--primary),var(--teal));border:0}
+  .store.primary:hover{filter:brightness(1.08)}
+  section{padding:56px 0}
+  h2{font-size:24px;font-weight:800;color:var(--strong);letter-spacing:-.01em;margin-bottom:14px}
+  p{margin-bottom:12px;font-size:16px}
+  .shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:10px}
+  .shots img{width:100%;border-radius:12px;border:1px solid var(--line);background:var(--soft)}
+  ul.feat{margin:0 0 12px 20px}
+  ul.feat li{margin-bottom:8px;font-size:16px}
+  .privacy{background:var(--soft);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;margin-top:8px}
+  .privacy b{color:var(--strong)}
+  .privacy p{color:var(--muted);font-size:15px;margin:6px 0 0}
+  footer{background:#0B1220;color:#8FA0BC;text-align:center;padding:28px 24px;font-size:13px}
+  footer a{color:#B6C2D9;text-decoration:none;margin:0 7px}
+  footer a:hover{color:#fff}
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "[APP NAME]",
+  "operatingSystem": "iOS, Android, Windows, macOS, Linux, Web",
+  "applicationCategory": "[e.g. ProductivityApplication / GameApplication]",
+  "description": "[Same one-sentence description as the meta tag.]",
+  "image": "https://nikatru.com/apps/shots/[SLUG]-1.webp",
+  "url": "https://nikatru.com/apps/[SLUG].html",
+  "offers": { "@type": "Offer", "price": "[0 or price]", "priceCurrency": "INR" },
+  "author": { "@id": "https://nikatru.com/#org" },
+  "publisher": { "@id": "https://nikatru.com/#org" }
+}
+</script>
+</head>
+<body>
+<nav>
+  <div class="nav-in">
+    <a class="brand" href="/">
+      <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="nm" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#2E6FF2"/><stop offset="1" stop-color="#17C3A2"/></linearGradient></defs>
+        <rect width="1024" height="1024" rx="226" fill="#111C33"/>
+        <path d="M 292 720 L 292 304 L 656 720 L 656 304 M 580 380 L 656 304 L 732 380" fill="none" stroke="url(#nm)" stroke-width="118" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>NIKATRU</span>
+    </a>
+    <a class="back" href="/">&larr; All apps</a>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap app-hero">
+    <div class="app-icon"><!-- <img src="/apps/icons/[SLUG].webp" alt=""> or an emoji -->&#128241;</div>
+    <div>
+      <h1>[APP NAME]</h1>
+      <p class="tagline">[Tagline — the one-line promise of the app.]</p>
+      <div class="stores">
+        <!-- keep only the stores where the app is actually live -->
+        <a class="store primary" href="[WEB APP URL]">Open Web App</a>
+        <a class="store" href="[PLAY STORE URL]">Google Play</a>
+        <a class="store" href="[APP STORE URL]">App Store</a>
+        <a class="store" href="[MS STORE URL]">Microsoft Store</a>
+        <a class="store" href="[FLATHUB/SNAP URL]">Linux</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="wrap">
+      <h2>Screenshots</h2>
+      <div class="shots">
+        <img src="/apps/shots/[SLUG]-1.webp" alt="[APP NAME] — [what this screen shows]" loading="lazy" width="440" height="275">
+        <img src="/apps/shots/[SLUG]-2.webp" alt="[APP NAME] — [what this screen shows]" loading="lazy" width="440" height="275">
+        <img src="/apps/shots/[SLUG]-3.webp" alt="[APP NAME] — [what this screen shows]" loading="lazy" width="440" height="275">
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <h2>About [APP NAME]</h2>
+      <p>[2–4 sentences: the problem, how the app solves it, who it's for.]</p>
+      <ul class="feat">
+        <li>[Feature 1]</li>
+        <li>[Feature 2]</li>
+        <li>[Feature 3]</li>
+      </ul>
+      <div class="privacy">
+        <b>Privacy</b>
+        <p>[Per-app privacy note, e.g.: No accounts, no tracking, no ads. Your data stays on your device.]
+        See the full <a href="/privacy.html">Privacy Policy</a>.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <a href="/">Home</a> &middot; <a href="/privacy.html">Privacy</a> &middot; <a href="/terms.html">Terms</a> &middot; <a href="/refund.html">Refunds</a> &middot; <a href="/contact.html">Contact</a><br><br>
+  &copy; 2026 NIKATRU&trade; &middot; Chennai, Tamil Nadu, India
+</footer>
+</body>
+</html>

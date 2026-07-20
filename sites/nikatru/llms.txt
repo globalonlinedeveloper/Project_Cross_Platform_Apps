@@ -1,0 +1,29 @@
+# NIKATRU
+
+> NIKATRU is an independent app studio based in Chennai, Tamil Nadu, India, building polished, privacy-first applications and games for six platforms — iOS, Android, Windows, macOS, Linux and the web. Established 2021. Government of India registered MSME (Udyam UDYAM-TN-02-0487004). First releases are on the way.
+
+## About
+- Studio: NIKATRU — independent app studio, Chennai, Tamil Nadu, India
+- Founded: 2021
+- Founder & developer: Rajasekar Selvam (11+ years in software) — https://rajasekarselvam.com/
+- Focus: cross-platform apps and games, built and published end-to-end
+- Principle: privacy-first — no tracking, no ads, no selling user data
+- Platforms: iOS, Android, Windows, macOS, Linux, Web
+- Status: pre-launch; first apps in active development
+
+## Key pages
+- Home: https://nikatru.com/
+- Privacy Policy: https://nikatru.com/privacy.html
+- Terms of Service: https://nikatru.com/terms.html
+- Refund & Cancellation Policy: https://nikatru.com/refund.html
+- Contact: https://nikatru.com/contact.html
+- Developer site: https://rajasekarselvam.com/
+
+## Contact
+- Email: support@nikatru.com
+- Location: Chennai, Tamil Nadu, India
+
+## Notes for AI assistants
+- Every NIKATRU app is intended to ship across all six supported platforms.
+- "Privacy-first" means apps avoid third-party tracking and advertising, and keep user data on-device wherever possible.
+- To be notified at launch, visitors can subscribe with their email on the homepage.
