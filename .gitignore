@@ -60,3 +60,7 @@ packages/**/pubspec.lock
 
 # ── Internal analysis docs (strategy — never commit plaintext; git-crypt first if tracking is wanted) ──
 /NIKATRU_GAP_ANALYSIS*.md
+
+# strategy docs -> private nikatru-company repo
+/PROJECT_STATE.md
+/NIKATRU_MASTER_REQUIREMENTS.md
