@@ -130,26 +130,41 @@ jobs:
       - run: dart test
 
   app_brick:
-    name: App brick (stamp _probe + analyze)
+    name: App brick (stamp probe + analyze app + validate service)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Install mason_cli
         run: dart pub global activate mason_cli
-      - name: Stamp a throwaway app from the brick
+      # Root-oriented stamp: emits apps/probe/ + services/probe-api/ and appends
+      # probe to sites/_shared/_data/apps.json (post_gen / SHOW-1).
+      - name: Stamp a throwaway app + service from the brick
         run: |
           export PATH="$PATH:$HOME/.pub-cache/bin"
           mason get
-          mason make app -c tooling/bricks/app/_probe_vars.json -o apps/_probe --on-conflict overwrite
+          mason make app -c tooling/bricks/app/_probe_vars.json -o . --on-conflict overwrite
+      - name: SHOW-1 — post_gen appended probe to apps.json (then revert)
+        run: |
+          grep -q '"slug": "probe"' sites/_shared/_data/apps.json
+          git checkout -- sites/_shared/_data/apps.json
       - name: Analyze + test the stamped app
-        working-directory: apps/_probe
+        working-directory: apps/probe
         run: |
           flutter pub get
           flutter analyze --no-fatal-infos
           flutter test
+      - name: Typecheck + dry-run the stamped service
+        working-directory: services/probe-api
+        run: |
+          npm install
+          npx tsc --noEmit
+          npx wrangler deploy --dry-run
 
   ci-gate:
     name: ci-gate

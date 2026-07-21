@@ -1,0 +1,3 @@
+# Copy to .dev.vars (gitignored) for `wrangler dev`. LOCAL dev secrets only.
+# Optional legacy HS256 fallback (most projects use ES256 JWKS — leave unset):
+# SUPABASE_JWT_SECRET=
