@@ -4,6 +4,9 @@ library;
 
 export 'src/content_pack.dart';
 export 'src/result.dart';
+export 'src/config/app_config.dart';
+export 'src/config/config_loader.dart';
+export 'src/config/default_configs.dart';
 export 'src/models/app_notification.dart';
 export 'src/models/budget_info.dart';
 export 'src/models/entitlement.dart';
