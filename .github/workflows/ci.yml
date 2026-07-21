@@ -25,12 +25,12 @@ jobs:
       - run: flutter analyze --no-fatal-infos
       - run: flutter test
 
-  backend:
-    name: Worker typecheck
+  subly_api:
+    name: subly-api Worker (typecheck + dry-run)
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend
+        working-directory: services/subly-api
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -38,6 +38,7 @@ jobs:
           node-version: 22
       - run: npm install
       - run: npx tsc --noEmit
+      - run: npx wrangler deploy --dry-run
 
   tokens:
     name: Design tokens (build + drift)
@@ -192,12 +193,12 @@ jobs:
   ci-gate:
     name: ci-gate
     runs-on: ubuntu-latest
-    needs: [flutter, backend, tokens, telemetry, site_shared, core, api_client, design_system, app_brick, workspace_gate]
+    needs: [flutter, subly_api, tokens, telemetry, site_shared, core, api_client, design_system, app_brick, workspace_gate]
     if: always()
     steps:
       - name: Require all lanes green
         run: |
-          echo "flutter=${{ needs.flutter.result }} backend=${{ needs.backend.result }} tokens=${{ needs.tokens.result }} telemetry=${{ needs.telemetry.result }} site_shared=${{ needs.site_shared.result }}"
+          echo "flutter=${{ needs.flutter.result }} subly_api=${{ needs.subly_api.result }} tokens=${{ needs.tokens.result }} telemetry=${{ needs.telemetry.result }} site_shared=${{ needs.site_shared.result }}"
           if [ "${{ contains(needs.*.result, 'failure') }}" = "true" ] || [ "${{ contains(needs.*.result, 'cancelled') }}" = "true" ]; then
             echo "::error::One or more CI lanes failed"; exit 1
           fi

@@ -1,0 +1,54 @@
+{
+  // ───────────────────────────────────────────────────────────────────────────
+  // Cloudflare Worker — subly-api. Wrangler v4 / jsonc (migrated from v3 toml).
+  // CLONE CONTRACT: APP_DB + EXPORTS are PER-APP; PLATFORM_DB + JWKS_CACHE +
+  // SUPABASE_URL are SHARED across every NIKATRU app (one entitlements table,
+  // one identity project). Matches tooling/bricks/app __brick__ services template.
+  //
+  // Migrations: APP_DB only (services/subly-api/migrations = subly_db). The
+  // shared platform_db (entitlements) is owned + migrated by services/platform.
+  // Cron: the nightly scheduler is CONSOLIDATED into services/platform (Supabase
+  // keep-alive + per-app renewals fan-out) — subly-api no longer carries a cron.
+  //
+  // Secrets are NOT set here (never committed): set with `wrangler secret put`.
+  //   wrangler secret put SUPABASE_JWT_SECRET       # optional HS256 legacy fallback
+  //   wrangler secret put REVENUECAT_WEBHOOK_SECRET  # RevenueCat webhook auth
+  // ───────────────────────────────────────────────────────────────────────────
+  "name": "subly-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-01",
+  "observability": { "enabled": true },
+  "vars": {
+    "APP_ID": "subly",
+    // Shared Supabase identity project (Cross_Platform_Auth, ap-south-1).
+    "SUPABASE_URL": "https://lcrkiurkvzhkonjwhpiv.supabase.co",
+    "API_VERSION": "v1",
+    // This app's web origins only (comma-separated). Empty/absent ⇒ '*'.
+    "ALLOWED_ORIGINS": "https://subly.nikatru.com,https://subly-9cp.pages.dev"
+  },
+  "d1_databases": [
+    {
+      // Per-app SQLite database (this app's private data). One per app.
+      "binding": "APP_DB",
+      "database_name": "subly_db",
+      "database_id": "88da9026-f72a-4cda-823d-431148fa8112",
+      "migrations_dir": "migrations"
+    },
+    {
+      // SHARED platform database (entitlements across the whole portfolio).
+      // Same id in every app's config. Migrated by services/platform (sole
+      // applier) — NO migrations_dir here.
+      "binding": "PLATFORM_DB",
+      "database_name": "platform_db",
+      "database_id": "9d1c5c63-97fe-4f82-bc7d-f3fd22e9b351"
+    }
+  ],
+  "kv_namespaces": [
+    // Caches the Supabase JWKS document (cuts JWT-verify latency). Shared.
+    { "binding": "JWKS_CACHE", "id": "bcfcb1618d1a4bfd8d02f87d3d21010d" }
+  ],
+  "r2_buckets": [
+    // CSV exports / receipts. Per-app.
+    { "binding": "EXPORTS", "bucket_name": "subly-exports" }
+  ]
+}

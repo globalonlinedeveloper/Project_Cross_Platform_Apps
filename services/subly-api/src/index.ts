@@ -17,7 +17,6 @@ import renewals from './routes/renewals';
 import budget from './routes/budget';
 import entitlements from './routes/entitlements';
 import webhooks from './routes/webhooks';
-import { scheduled } from './scheduled';
 
 const app = new Hono<AppEnv>();
 
@@ -60,4 +59,4 @@ app.onError((err, c) => {
   return c.json({ error: 'internal_error' }, 500);
 });
 
-export default { fetch: app.fetch, scheduled };
+export default { fetch: app.fetch };
