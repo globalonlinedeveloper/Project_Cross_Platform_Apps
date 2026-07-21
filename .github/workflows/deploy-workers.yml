@@ -1,0 +1,76 @@
+name: Deploy Workers
+
+# Deploys the Cloudflare Workers in services/ on push to main. Path-scoped so a
+# change to one service never redeploys the other (mirrors deploy-web.yml's
+# scoping for the Flutter web app). Uses the SAME scoped Cloudflare credentials
+# as deploy-web.yml — CLOUDFLARE_API_TOKEN must include **Workers Scripts: Edit**
+# (the token in cowork-private/secrets.env already deploys these Workers).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'services/subly-api/**'
+      - 'services/platform/**'
+      - '.github/workflows/deploy-workers.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-workers
+  cancel-in-progress: false
+
+jobs:
+  detect:
+    name: Detect changed services
+    runs-on: ubuntu-latest
+    outputs:
+      subly_api: ${{ steps.filter.outputs.subly_api }}
+      platform: ${{ steps.filter.outputs.platform }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            subly_api:
+              - 'services/subly-api/**'
+            platform:
+              - 'services/platform/**'
+
+  subly-api:
+    name: Deploy subly-api
+    needs: detect
+    if: needs.detect.outputs.subly_api == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+        working-directory: services/subly-api
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: services/subly-api
+          command: deploy
+
+  platform:
+    name: Deploy platform
+    needs: detect
+    if: needs.detect.outputs.platform == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+        working-directory: services/platform
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: services/platform
+          command: deploy
