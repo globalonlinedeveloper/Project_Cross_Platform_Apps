@@ -1,0 +1,50 @@
+{
+  // ───────────────────────────────────────────────────────────────────────────
+  // Cloudflare Worker — platform. Wrangler v4 / jsonc. The ONE shared service:
+  //   • GET /config/<app>  — CFG-1 config chassis (KV-backed, edge-cached) with
+  //                          compiled-in defaults; DATA/flags, never server UI.
+  //   • cron 0 6 * * *     — CONSOLIDATED scheduler for the whole portfolio
+  //                          (Supabase keep-alive + per-app renewals fan-out),
+  //                          staying under the 5-cron-triggers/account Free cap.
+  //
+  // Sole applier of platform_db migrations (entitlements). Per-app APP_DBs are
+  // bound read/write here ONLY for the renewals fan-out (subly today; add more
+  // as apps ship). Secrets via `wrangler secret put` (never committed).
+  // ───────────────────────────────────────────────────────────────────────────
+  "name": "platform",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-01",
+  "observability": { "enabled": true },
+  "vars": {
+    "APP_ID": "platform",
+    "SUPABASE_URL": "https://lcrkiurkvzhkonjwhpiv.supabase.co",
+    "API_VERSION": "v1",
+    // Config reads are public, non-secret DATA served to every app → '*'
+    // (leave empty to fall back to '*'; tighten if a private key ever ships).
+    "ALLOWED_ORIGINS": ""
+  },
+  "d1_databases": [
+    {
+      // SHARED entitlements DB. platform is the SOLE migrations applier.
+      "binding": "PLATFORM_DB",
+      "database_name": "platform_db",
+      "database_id": "9d1c5c63-97fe-4f82-bc7d-f3fd22e9b351",
+      "migrations_dir": "migrations"
+    },
+    {
+      // Subly's per-app DB — bound for the nightly renewals fan-out only.
+      // (subly-api owns subly_db's own migrations; NO migrations_dir here.)
+      "binding": "SUBLY_DB",
+      "database_name": "subly_db",
+      "database_id": "88da9026-f72a-4cda-823d-431148fa8112"
+    }
+  ],
+  "kv_namespaces": [
+    // Edge-cached per-app config overrides (key: `config:<app>`).
+    { "binding": "CONFIG_KV", "id": "33e4e58abb644d0e917a159227c6c134" }
+  ],
+  "triggers": {
+    // ONE nightly cron for the whole portfolio (06:00 UTC).
+    "crons": ["0 6 * * *"]
+  }
+}
