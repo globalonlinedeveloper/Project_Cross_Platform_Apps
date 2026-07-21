@@ -27,6 +27,13 @@ class AppConfig {
   static const String apiBaseUrl =
       String.fromEnvironment('API_BASE_URL', defaultValue: _phApiBase);
 
+  // ── CFG-1 config chassis host — where the app reads runtime config at
+  // launch. Public, non-secret; overridable via --dart-define for a staging
+  // config host.
+  static const String configBaseUrl = String.fromEnvironment(
+      'CONFIG_BASE_URL',
+      defaultValue: 'https://config.nikatru.com');
+
   // ── RevenueCat (paid subscriptions) ──
   static const String revenueCatApiKey =
       String.fromEnvironment('REVENUECAT_KEY', defaultValue: '');

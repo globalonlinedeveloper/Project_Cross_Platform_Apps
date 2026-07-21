@@ -1,0 +1,184 @@
+import 'package:nikatru_core/nikatru_core.dart';
+import 'package:test/test.dart';
+
+/// The exact JSON the platform Worker serves for `GET /config/subly`
+/// (mirrors `services/platform/src/config.ts` DEFAULT_CONFIGS.subly).
+Map<String, Object?> sublyServerJson() => <String, Object?>{
+      'app_id': 'subly',
+      'api_base_url': 'https://api.nikatru.com/v1',
+      'features': <String, Object?>{
+        'renewals': true,
+        'budgets': true,
+        'exports': true,
+      },
+      'paywall': <String, Object?>{'enabled': false},
+      'content_pack': null,
+      'copy': <String, Object?>{},
+      'min_supported_version': '1.0.0',
+    };
+
+/// A programmable [ConfigTransport] — no network. Starts either succeeding with
+/// a JSON body or failing; switch mid-test with [succeedWith] / [failWith].
+class FakeTransport implements ConfigTransport {
+  FakeTransport.ok(this._json);
+  FakeTransport.offline() : _json = null, _failure = const Failure('offline');
+
+  Map<String, Object?>? _json;
+  Failure? _failure;
+  int calls = 0;
+
+  void succeedWith(Map<String, Object?> json) {
+    _json = json;
+    _failure = null;
+  }
+
+  void failWith([String message = 'offline']) {
+    _failure = Failure(message);
+    _json = null;
+  }
+
+  @override
+  Future<Result<Map<String, Object?>>> fetch(String appId) async {
+    calls++;
+    final Failure? f = _failure;
+    if (f != null) return Result<Map<String, Object?>>.err(f);
+    return Result<Map<String, Object?>>.ok(_json!);
+  }
+}
+
+void main() {
+  group('AppConfig.fromJson (CFG-1 contract shape)', () {
+    test('parses the server config into typed fields', () {
+      final AppConfig c = AppConfig.fromJson(sublyServerJson());
+      expect(c.appId, 'subly');
+      expect(c.apiBaseUrl, 'https://api.nikatru.com/v1');
+      expect(c.feature('renewals'), isTrue);
+      expect(c.feature('budgets'), isTrue);
+      expect(c.feature('exports'), isTrue);
+      expect(c.paywall.enabled, isFalse);
+      expect(c.contentPack, isNull);
+      expect(c.copy, isEmpty);
+      expect(c.minSupportedVersion, '1.0.0');
+      expect(c.theme, isNull);
+    });
+
+    test('round-trips through toJson with snake_case keys', () {
+      final Map<String, Object?> j = AppConfig.fromJson(sublyServerJson()).toJson();
+      expect(j.containsKey('api_base_url'), isTrue);
+      expect(j.containsKey('min_supported_version'), isTrue);
+      final AppConfig again = AppConfig.fromJson(j);
+      expect(again.apiBaseUrl, 'https://api.nikatru.com/v1');
+      expect(again.feature('renewals'), isTrue);
+      expect(again.paywall.enabled, isFalse);
+    });
+
+    test('preserves unknown paywall keys (forward-compatible)', () {
+      final Map<String, Object?> j = sublyServerJson()
+        ..['paywall'] = <String, Object?>{'enabled': true, 'plan': 'pro'};
+      final AppConfig c = AppConfig.fromJson(j);
+      expect(c.paywall.enabled, isTrue);
+      expect(c.paywall.extra['plan'], 'pro');
+      expect(c.paywall.toJson()['plan'], 'pro');
+    });
+
+    test('throws FormatException when api_base_url is missing', () {
+      final Map<String, Object?> j = sublyServerJson()..remove('api_base_url');
+      expect(() => AppConfig.fromJson(j), throwsFormatException);
+    });
+
+    test('feature() and text() honor their fallbacks', () {
+      final AppConfig c = AppConfig.fromJson(sublyServerJson())
+          .copyWith(copy: <String, String>{'welcome': 'Hi'});
+      expect(c.text('welcome'), 'Hi');
+      expect(c.text('missing'), 'missing');
+      expect(c.feature('nope'), isFalse);
+      expect(c.feature('nope', orElse: true), isTrue);
+    });
+  });
+
+  group('bundled defaults mirror the server DEFAULT_CONFIGS', () {
+    test('defaultConfigFor(subly) equals the server contract values', () {
+      final AppConfig? d = defaultConfigFor('subly');
+      expect(d, isNotNull);
+      expect(d!.appId, 'subly');
+      expect(d.apiBaseUrl, 'https://api.nikatru.com/v1');
+      expect(d.features, <String, bool>{
+        'renewals': true,
+        'budgets': true,
+        'exports': true,
+      });
+      expect(d.paywall.enabled, isFalse);
+      expect(d.contentPack, isNull);
+      expect(d.copy, isEmpty);
+      expect(d.minSupportedVersion, '1.0.0');
+    });
+
+    test('unregistered app has no default', () {
+      expect(defaultConfigFor('ghost'), isNull);
+    });
+  });
+
+  group('ConfigLoader (network → cache → bundled default)', () {
+    test('returns the server config on a successful fetch', () async {
+      final FakeTransport t = FakeTransport.ok(sublyServerJson());
+      final ConfigLoader loader = ConfigLoader(transport: t);
+      final Result<AppConfig> r = await loader.load('subly');
+      expect(r.isOk, isTrue);
+      expect(r.fold((AppConfig c) => c.apiBaseUrl, (_) => 'err'),
+          'https://api.nikatru.com/v1');
+      expect(t.calls, 1);
+    });
+
+    test('falls back to the bundled default when offline (offline-safe)', () async {
+      final FakeTransport t = FakeTransport.offline();
+      final ConfigLoader loader = ConfigLoader(transport: t);
+      final Result<AppConfig> r = await loader.load('subly');
+      expect(r.isOk, isTrue);
+      expect(r.fold((AppConfig c) => c.apiBaseUrl, (_) => 'err'),
+          'https://api.nikatru.com/v1');
+    });
+
+    test('prefers the last-good cache over the bundled default', () async {
+      final Map<String, Object?> override = sublyServerJson()
+        ..['api_base_url'] = 'https://api-canary.nikatru.com/v1'
+        ..['paywall'] = <String, Object?>{'enabled': true};
+      final FakeTransport t = FakeTransport.ok(override);
+      final ConfigLoader loader = ConfigLoader(transport: t);
+
+      final Result<AppConfig> first = await loader.load('subly');
+      expect(first.fold((AppConfig c) => c.apiBaseUrl, (_) => 'err'),
+          'https://api-canary.nikatru.com/v1');
+
+      t.failWith(); // network drops
+      final Result<AppConfig> second = await loader.load('subly');
+      expect(second.isOk, isTrue);
+      expect(second.fold((AppConfig c) => c.apiBaseUrl, (_) => 'err'),
+          'https://api-canary.nikatru.com/v1');
+      expect(second.fold((AppConfig c) => c.paywall.enabled, (_) => false), isTrue);
+    });
+
+    test('falls back to the default when the body is malformed', () async {
+      final FakeTransport t = FakeTransport.ok(<String, Object?>{'nonsense': 1});
+      final ConfigLoader loader = ConfigLoader(transport: t);
+      final Result<AppConfig> r = await loader.load('subly');
+      expect(r.isOk, isTrue);
+      expect(r.fold((AppConfig c) => c.apiBaseUrl, (_) => 'err'),
+          'https://api.nikatru.com/v1');
+    });
+
+    test('errs for an unknown app with no default when offline', () async {
+      final FakeTransport t = FakeTransport.offline();
+      final ConfigLoader loader = ConfigLoader(transport: t);
+      final Result<AppConfig> r = await loader.load('ghost');
+      expect(r.isOk, isFalse);
+    });
+
+    test('peek returns the bundled default without any network call', () async {
+      final FakeTransport t = FakeTransport.offline();
+      final ConfigLoader loader = ConfigLoader(transport: t);
+      expect(loader.peek('subly')?.apiBaseUrl, 'https://api.nikatru.com/v1');
+      expect(loader.peek('ghost'), isNull);
+      expect(t.calls, 0);
+    });
+  });
+}
