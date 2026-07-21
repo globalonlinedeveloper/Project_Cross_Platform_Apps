@@ -11,6 +11,10 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Shared core domain layer (models, Result/Failure, content packs).
+  nikatru_core:
+    path: ../packages/core
+
   # State management
   flutter_riverpod: ^2.5.0
 
