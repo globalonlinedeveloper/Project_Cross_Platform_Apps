@@ -7,6 +7,10 @@ name: Deploy Web
 on:
   push:
     branches: [main]
+    paths:
+      - 'app/**'
+      - 'packages/**'
+      - '.github/workflows/deploy-web.yml'
   workflow_dispatch:
 
 concurrency:
