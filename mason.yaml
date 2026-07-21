@@ -1,0 +1,4 @@
+# Mason brick registry. `mason get` then `mason make app -c <vars>.json -o apps/<id>`.
+bricks:
+  app:
+    path: tooling/bricks/app

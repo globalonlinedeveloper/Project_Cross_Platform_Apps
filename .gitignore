@@ -63,3 +63,10 @@ Thumbs.db
 # ── strategy docs -> private nikatru-company repo ──
 /PROJECT_STATE.md
 /NIKATRU_MASTER_REQUIREMENTS.md
+
+# Throwaway app stamped by the brick CI lane (P0.7)
+apps/_probe/
+
+# Mason local brick cache
+.mason/
+mason-lock.json
