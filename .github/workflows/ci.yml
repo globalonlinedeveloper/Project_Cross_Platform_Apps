@@ -99,10 +99,25 @@ jobs:
       - run: dart analyze
       - run: dart test
 
+  api_client:
+    name: API client (analyze + test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/api_client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: dart pub get
+      - run: dart analyze
+      - run: dart test
+
   ci-gate:
     name: ci-gate
     runs-on: ubuntu-latest
-    needs: [flutter, backend, tokens, telemetry, site_shared, core]
+    needs: [flutter, backend, tokens, telemetry, site_shared, core, api_client]
     if: always()
     steps:
       - name: Require all lanes green

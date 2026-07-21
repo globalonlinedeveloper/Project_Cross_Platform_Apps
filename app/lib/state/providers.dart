@@ -26,7 +26,10 @@ final StreamProvider<AuthUser?> authStateProvider =
 /// API: real Worker via Dio when configured, else the seed client (demo mode).
 final Provider<ApiClient> apiClientProvider = Provider<ApiClient>((ref) =>
     AppConfig.isApiConfigured
-        ? DioApiClient(ref.watch(authRepositoryProvider))
+        ? DioApiClient(
+            baseUrl: '${AppConfig.apiBaseUrl}/v1',
+            tokenProvider: ref.watch(authRepositoryProvider).currentAccessToken,
+          )
         : SeedApiClient());
 
 final Provider<SubscriptionRepository> subscriptionRepositoryProvider =
