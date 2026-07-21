@@ -4,7 +4,7 @@ import '../../core/app_config.dart';
 
 /// Settings — carries the chassis-mandated support contact (E1) and the
 /// in-app account-deletion entry (G2). The Worker-side delete route is wired
-/// by the services template (see services/<app>-api).
+/// by the services template (see services/{{app_id.snakeCase()}}-api).
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
