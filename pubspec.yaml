@@ -1,16 +1,26 @@
 name: nikatru_workspace
 description: >-
   Nikatru Cross Platform Apps — monorepo workspace root (Dart pub workspaces +
-  Melos 8). Members: shared packages under packages/. The Subly app (apps/subly/)
-  stays a standalone package until P0.6 relocates it to apps/subly.
+  Melos 8). Members: the shared packages under packages/ AND the Subly app
+  (apps/subly/). P0.8 promoted the spine packages + Subly to workspace members
+  so a single `melos run gate` analyzes and tests the whole tree in one
+  resolution.
 publish_to: none
 
 environment:
   sdk: ^3.9.0
 
-# Workspace members — explicit paths (Melos 8 docs: no globs here yet).
+# Workspace members — explicit paths (Dart pub workspaces / Melos 8: no globs).
+# Pure-Dart and Flutter packages share ONE resolution; the workspace_gate CI
+# lane resolves with `flutter pub get` because the Flutter members require the
+# Flutter tool (plain `dart pub get` cannot resolve `sdk: flutter` deps).
 workspace:
   - packages/analysis
+  - packages/core
+  - packages/api_client
+  - packages/design_system
+  - packages/telemetry
+  - apps/subly
 
 dev_dependencies:
   melos: ^8.2.2
@@ -19,12 +29,18 @@ dev_dependencies:
 melos:
   scripts:
     analyze:
-      run: melos exec --fail-fast -- dart analyze --fatal-infos .
+      run: melos exec --fail-fast -- dart analyze
       description: >-
-        Analyze every workspace package. Pure-Dart packages only for now;
-        the Subly app keeps its own CI lane until P0.8 unifies the gate.
+        Analyze every workspace member. `dart analyze` resolves Flutter types
+        from the shared package config; infos stay non-fatal, matching the
+        per-lane `flutter analyze --no-fatal-infos` posture.
     test:
-      run: melos exec --fail-fast --dir-exists=test -- dart test
+      run: melos exec --fail-fast --dir-exists=test --no-flutter -- dart test && melos exec --fail-fast --dir-exists=test --flutter -- flutter test
       description: >-
-        Run tests in every workspace package that has a test/ directory
-        (first such package lands with P0.3).
+        Pure-Dart members (core, api_client) run under `dart test`; Flutter
+        members (design_system, telemetry, subly) run under `flutter test`.
+    gate:
+      run: melos run analyze && melos run test
+      description: >-
+        The unified quality gate — analyze + test across every member. §14's
+        definition of green: `melos bootstrap && melos run gate` passes.
