@@ -5,6 +5,9 @@ name: Deploy Workers
 # scoping for the Flutter web app). Uses the SAME scoped Cloudflare credentials
 # as deploy-web.yml — CLOUDFLARE_API_TOKEN must include **Workers Scripts: Edit**
 # (the token in cowork-private/secrets.env already deploys these Workers).
+#
+# Manual run: Actions ▸ Deploy Workers ▸ "Run workflow" (workflow_dispatch)
+# redeploys BOTH Workers from current main — a manual redeploy / rollback button.
 
 on:
   push:
@@ -24,18 +27,29 @@ jobs:
     name: Detect changed services
     runs-on: ubuntu-latest
     outputs:
-      subly_api: ${{ steps.filter.outputs.subly_api }}
-      platform: ${{ steps.filter.outputs.platform }}
+      subly_api: ${{ steps.decide.outputs.subly_api }}
+      platform: ${{ steps.decide.outputs.platform }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
+        if: github.event_name == 'push'
         with:
           filters: |
             subly_api:
               - 'services/subly-api/**'
             platform:
               - 'services/platform/**'
+      - id: decide
+        # Manual dispatch has no diff to filter on → deploy both. Push → per-path.
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "subly_api=true"  >> "$GITHUB_OUTPUT"
+            echo "platform=true"   >> "$GITHUB_OUTPUT"
+          else
+            echo "subly_api=${{ steps.filter.outputs.subly_api }}" >> "$GITHUB_OUTPUT"
+            echo "platform=${{ steps.filter.outputs.platform }}"   >> "$GITHUB_OUTPUT"
+          fi
 
   subly-api:
     name: Deploy subly-api
