@@ -110,7 +110,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-      - run: dart pub get
+      - run: flutter pub get
       - run: dart analyze
       - run: dart test
 
@@ -125,7 +125,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-      - run: dart pub get
+      - run: flutter pub get
       - run: dart analyze
       - run: dart test
 
@@ -166,10 +166,33 @@ jobs:
           npx tsc --noEmit
           npx wrangler deploy --dry-run
 
+  workspace_gate:
+    name: Workspace gate (melos analyze + test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Activate melos
+        run: dart pub global activate melos 8.2.2
+      # Flutter members require the Flutter tool for root workspace resolution
+      # (plain `dart pub get` cannot resolve `sdk: flutter` dependencies).
+      - name: Resolve the workspace
+        run: flutter pub get
+      - name: melos run analyze
+        run: |
+          export PATH="$PATH:$HOME/.pub-cache/bin"
+          melos run analyze
+      - name: melos run test
+        run: |
+          export PATH="$PATH:$HOME/.pub-cache/bin"
+          melos run test
+
   ci-gate:
     name: ci-gate
     runs-on: ubuntu-latest
-    needs: [flutter, backend, tokens, telemetry, site_shared, core, api_client, design_system, app_brick]
+    needs: [flutter, backend, tokens, telemetry, site_shared, core, api_client, design_system, app_brick, workspace_gate]
     if: always()
     steps:
       - name: Require all lanes green
