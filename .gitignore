@@ -65,7 +65,8 @@ Thumbs.db
 /NIKATRU_MASTER_REQUIREMENTS.md
 
 # Throwaway app stamped by the brick CI lane (P0.7)
-apps/_probe/
+apps/probe/
+services/probe-api/
 
 # Mason local brick cache
 .mason/

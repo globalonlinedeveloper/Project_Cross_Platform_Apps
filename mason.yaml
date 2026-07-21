@@ -1,4 +1,6 @@
-# Mason brick registry. `mason get` then `mason make app -c <vars>.json -o apps/<id>`.
+# Mason brick registry. Root-oriented: run from the repo root with `-o .` so a
+# stamp emits BOTH apps/<id>/ and services/<id>-api/ and appends to apps.json:
+#   mason get && mason make app -c <vars>.json -o . --on-conflict overwrite
 bricks:
   app:
     path: tooling/bricks/app
