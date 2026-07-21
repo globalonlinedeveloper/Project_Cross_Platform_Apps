@@ -1,0 +1,34 @@
+name: {{app_id.snakeCase()}}
+description: "{{display_name}} — a NIKATRU Cross Platform App."
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Shared spine (path deps — apps/<id> sits two levels above packages/).
+  nikatru_core:
+    path: ../../packages/core
+  nikatru_api_client:
+    path: ../../packages/api_client
+  nikatru_design_system:
+    path: ../../packages/design_system
+  nikatru_telemetry:
+    path: ../../packages/telemetry
+
+  # State (Riverpod 2.x-LTS, non-codegen — locked chassis choice) + routing.
+  flutter_riverpod: ^2.5.0
+  go_router: ^14.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

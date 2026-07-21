@@ -1,0 +1,44 @@
+name: app
+description: >-
+  Stamps a new NIKATRU Cross Platform App, pre-wired to the shared spine
+  (design_system, api_client, core) and telemetry. Input contract = app.yaml
+  (master §10-B). Proven in CI by stamping a throwaway apps/_probe and analyzing.
+version: 0.1.0
+
+environment:
+  mason: ">=0.1.0 <0.2.0"
+
+vars:
+  app_id:
+    type: string
+    description: Lowercase snake_case app id (also the Dart package name), e.g. lingo
+    prompt: App id (lowercase)
+  display_name:
+    type: string
+    description: Human display name, e.g. "Lingo — Offline Phrasebook"
+    prompt: Display name
+  subdomain:
+    type: string
+    description: Web subdomain, e.g. lingo.nikatru.com
+    prompt: Web subdomain
+    default: ""
+  api_domain:
+    type: string
+    description: API host (single-label standard), e.g. api-lingo.nikatru.com
+    prompt: API domain
+    default: ""
+  seed_hex:
+    type: string
+    description: Brand seed colour as 6 hex digits without '#', e.g. 1E88E5
+    prompt: Brand seed hex (RRGGBB)
+    default: "6459F5"
+  category:
+    type: string
+    description: Store category, e.g. travel
+    prompt: Category
+    default: productivity
+  description:
+    type: string
+    description: One-line differentiation for store listings
+    prompt: Differentiation line
+    default: ""
