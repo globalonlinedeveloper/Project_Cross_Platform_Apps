@@ -66,7 +66,7 @@ All of it lives in `src/middleware/auth.ts` — the single provider seam.
 Set config/secrets:
 
 ```bash
-# non-secret (wrangler.toml [vars]): SUPABASE_URL, APP_ID, API_VERSION
+# non-secret (wrangler.jsonc vars): SUPABASE_URL, APP_ID, API_VERSION
 wrangler secret put SUPABASE_JWT_SECRET        # optional (HS256 fallback)
 wrangler secret put REVENUECAT_WEBHOOK_SECRET  # RevenueCat webhook auth
 ```
@@ -74,32 +74,35 @@ wrangler secret put REVENUECAT_WEBHOOK_SECRET  # RevenueCat webhook auth
 **Swap to Firebase/Auth0/etc.:** edit only `auth.ts` — repoint issuer + JWKS URL.
 The rest of the app just reads `c.get('userId')`.
 
-## Cron keep-alive (why the nightly trigger exists)
+## Nightly cron (consolidated into services/platform)
 
-`crons = ["0 6 * * *"]` runs `src/scheduled.ts`:
+subly-api no longer carries its own cron trigger. The nightly scheduler
+(`0 6 * * *`) is **consolidated into `services/platform`** so the whole
+portfolio shares ONE cron (staying under the 5-cron-triggers/account Free cap):
 
-1. **keepAliveSupabase** — a cheap daily GET to `${SUPABASE_URL}/auth/v1/health`.
-   Supabase pauses free-tier projects after ~7 days idle, which would break
-   sign-in for a low-traffic app; this heartbeat keeps it active. Errors ignored.
-2. **recomputeRenewals** — rolls any past-due `next_renewal` forward one cycle
-   (monthly `+1 month`, yearly `+1 year`), inserts a `payment_history` row per
-   crossed charge, and bumps `updated_at`. Batched via D1.
+1. **keepAliveSupabase** — a cheap daily GET to `${SUPABASE_URL}/auth/v1/health`
+   (Supabase pauses free-tier projects after ~7 days idle). Platform-wide.
+2. **recomputeRenewals** — the platform scheduler fans out per-app, rolling any
+   past-due `next_renewal` forward one cycle (monthly/yearly), inserting a
+   `payment_history` row per crossed charge, over each app's bound `APP_DB`.
+
+The renewals HTTP read endpoint (`GET /v1/renewals`) still lives here.
 
 ## Clone for the next app
 
 The template is designed so each new tracker app is a copy with three edits:
 
-1. In `wrangler.toml`: change `name`, `[vars].APP_ID`, and the **APP_DB**
+1. In `wrangler.jsonc`: change `name`, `vars.APP_ID`, and the **APP_DB**
    `database_name` + `database_id` (run `wrangler d1 create <newapp>_db`).
 2. Keep **PLATFORM_DB** (`platform_db`) identical — all apps share one
    entitlements table.
 3. Keep **SUPABASE_URL** identical — all apps share one Supabase identity project.
 
 Then apply `migrations/0001_init.sql` to the new APP_DB. The shared
-`0002_entitlements.sql` only needs to be applied to `platform_db` once for the
-whole portfolio.
+entitlements schema (`platform_db`) is owned + migrated by **`services/platform`**
+(its `migrations/0001_entitlements.sql`), applied once for the whole portfolio.
 
 ### REPLACE_ tokens to fill before going live
 
-- `wrangler.toml` → `SUPABASE_URL`, APP_DB `database_id` (`REPLACE_WITH_D1_ID`),
+- `wrangler.jsonc` → `SUPABASE_URL`, APP_DB `database_id` (`REPLACE_WITH_D1_ID`),
   PLATFORM_DB `database_id` (`REPLACE_SHARED_D1_ID`), KV `id` (`REPLACE_KV_ID`).

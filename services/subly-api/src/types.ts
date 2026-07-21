@@ -1,9 +1,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Shared types for the Worker. Keep the Env interface in sync with wrangler.toml.
+// Shared types for the Worker. Keep the Env interface in sync with wrangler.jsonc.
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Worker bindings + environment. Names must match wrangler.toml bindings.
+ * Worker bindings + environment. Names must match wrangler.jsonc bindings.
  * Secrets are optional here because they arrive via `wrangler secret put` /
  * .dev.vars and may be absent in template mode.
  */
@@ -18,7 +18,7 @@ export interface Env {
   // R2 — CSV exports / receipts
   EXPORTS: R2Bucket;
 
-  // Non-secret vars (wrangler.toml [vars])
+  // Non-secret vars (wrangler.jsonc vars)
   APP_ID: string;
   SUPABASE_URL: string;
   API_VERSION: string;
