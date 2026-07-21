@@ -1,0 +1,42 @@
+{#-
+  SEO partial: canonical + Open Graph + Twitter meta and JSON-LD.
+  Emits an Organization schema for the site; when a page sets an `app`
+  object in front matter (name, tagline, url), it emits a
+  SoftwareApplication schema instead.
+-#}
+{%- set seoTitle = title or site.name -%}
+{%- set seoDescription = description or site.description -%}
+{%- set seoUrl = (site.url ~ page.url) if page.url else site.url %}
+  <link rel="canonical" href="{{ seoUrl }}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ site.name }}">
+  <meta property="og:title" content="{{ seoTitle }}">
+  <meta property="og:description" content="{{ seoDescription }}">
+  <meta property="og:url" content="{{ seoUrl }}">
+  {%- if site.ogImage %}
+  <meta property="og:image" content="{{ site.ogImage }}">
+  {%- endif %}
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{ seoTitle }}">
+  <meta name="twitter:description" content="{{ seoDescription }}">
+{%- if app %}
+{%- set ld = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": app.name,
+  "description": app.tagline,
+  "url": app.url,
+  "applicationCategory": app.category or "WebApplication",
+  "operatingSystem": app.os or "Web",
+  "publisher": { "@type": "Organization", "name": site.name, "url": site.url }
+} %}
+{%- else %}
+{%- set ld = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": site.name,
+  "description": site.description,
+  "url": site.url
+} %}
+{%- endif %}
+  <script type="application/ld+json">{{ ld | jsonify | safe }}</script>

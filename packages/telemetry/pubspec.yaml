@@ -1,0 +1,24 @@
+name: nikatru_telemetry
+description: >-
+  GlitchTip/Sentry telemetry facade for NIKATRU apps. Isolates sentry_flutter
+  behind a small TelemetryClient interface and scrubs Indian PII (PAN, Aadhaar,
+  email, phone numbers) from every event before it leaves the device.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Latest stable verified on pub.dev (9.24.0, July 2026). sentry_flutter 9.x
+  # requires Dart >=3.5.0 / Flutter >=3.24.0, matching this package's
+  # environment. Data classes are mutable in 9.x (beforeSend mutates in place).
+  sentry_flutter: ^9.24.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

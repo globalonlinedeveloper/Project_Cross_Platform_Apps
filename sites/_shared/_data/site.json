@@ -1,0 +1,11 @@
+{
+  "name": "NIKATRU",
+  "tagline": "Small, focused apps",
+  "description": "NIKATRU builds small, focused apps — starting with Subly, a subscription tracker.",
+  "url": "https://nikatru.com",
+  "lang": "en",
+  "nav": [
+    { "label": "Home", "href": "/" },
+    { "label": "Apps", "href": "/#apps" }
+  ]
+}

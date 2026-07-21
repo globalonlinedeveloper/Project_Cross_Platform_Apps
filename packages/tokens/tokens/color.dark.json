@@ -1,0 +1,13 @@
+{
+  "dark": {
+    "$type": "color",
+    "$description": "Dark-scheme overrides. Only surfaces/text change; ink, ink-2, primary and teal are shared with the light palette.",
+    "bg": { "$value": "#0B1220" },
+    "card": { "$value": "#111C33" },
+    "card-2": { "$value": "#0E1830" },
+    "text": { "$value": "#C7D2E3" },
+    "strong": { "$value": "#F1F5F9" },
+    "muted": { "$value": "#93A1BC" },
+    "line": { "$value": "#22304D" }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "color": {
+    "$type": "color",
+    "$description": "NIKATRU light palette. Canonical values mirror the live nikatru.com :root.",
+    "ink": { "$value": "#0B1220" },
+    "ink-2": { "$value": "#111C33" },
+    "primary": { "$value": "#2E6FF2" },
+    "teal": { "$value": "#17C3A2" },
+    "bg": { "$value": "#F6F8FC" },
+    "card": { "$value": "#FFFFFF" },
+    "card-2": { "$value": "#F8FAFD" },
+    "text": { "$value": "#334155" },
+    "strong": { "$value": "#0B1220" },
+    "muted": { "$value": "#586275" },
+    "line": { "$value": "#E2E8F0" }
+  }
+}

@@ -1,0 +1,21 @@
+{#-
+  App card partial. Expects an `app` object in scope:
+  { slug, name, tagline, url, api?, platforms[], status }
+  Usage: {% for app in apps %}{% include "partials/app-card.njk" %}{% endfor %}
+-#}
+<article class="app-card" aria-labelledby="app-{{ app.slug }}-name">
+  <div class="app-card__head">
+    <h3 class="app-card__name" id="app-{{ app.slug }}-name">
+      <a href="{{ app.url }}">{{ app.name }}</a>
+    </h3>
+    <span class="badge badge--{{ app.status }}">{{ app.status }}</span>
+  </div>
+  <p class="app-card__tagline">{{ app.tagline }}</p>
+  {%- if app.platforms and app.platforms.length %}
+  <ul class="app-card__platforms" role="list" aria-label="{{ app.name }} platforms">
+    {%- for platform in app.platforms %}
+    <li class="chip">{{ platform }}</li>
+    {%- endfor %}
+  </ul>
+  {%- endif %}
+</article>

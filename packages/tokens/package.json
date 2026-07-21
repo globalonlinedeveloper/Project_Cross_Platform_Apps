@@ -1,0 +1,17 @@
+{
+  "name": "@nikatru/tokens",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NIKATRU brand design tokens - DTCG JSON compiled to Dart constants and CSS variables with Style Dictionary.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "build": "style-dictionary build --config ./style-dictionary.config.mjs"
+  },
+  "devDependencies": {
+    "style-dictionary": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

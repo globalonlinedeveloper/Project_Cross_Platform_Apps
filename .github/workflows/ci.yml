@@ -2,12 +2,16 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'feat/**']
   pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   flutter:
-    name: Flutter analyze
+    name: Flutter analyze (app)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -34,3 +38,62 @@ jobs:
           node-version: 22
       - run: npm install
       - run: npx tsc --noEmit
+
+  tokens:
+    name: Design tokens (build + drift)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/tokens
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run build
+      - name: Committed token outputs must equal a fresh build
+        run: git diff --exit-code -- build
+
+  telemetry:
+    name: Telemetry (analyze + test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/telemetry
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze --no-fatal-infos
+      - run: flutter test
+
+  site_shared:
+    name: Shared site build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sites/_shared
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run build
+
+  ci-gate:
+    name: ci-gate
+    runs-on: ubuntu-latest
+    needs: [flutter, backend, tokens, telemetry, site_shared]
+    if: always()
+    steps:
+      - name: Require all lanes green
+        run: |
+          echo "flutter=${{ needs.flutter.result }} backend=${{ needs.backend.result }} tokens=${{ needs.tokens.result }} telemetry=${{ needs.telemetry.result }} site_shared=${{ needs.site_shared.result }}"
+          if [ "${{ contains(needs.*.result, 'failure') }}" = "true" ] || [ "${{ contains(needs.*.result, 'cancelled') }}" = "true" ]; then
+            echo "::error::One or more CI lanes failed"; exit 1
+          fi
+          echo "All lanes green"

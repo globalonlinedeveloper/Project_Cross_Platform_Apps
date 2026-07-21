@@ -1,0 +1,33 @@
+/*
+ * NIKATRU design tokens — mirrors the live nikatru.com :root.
+ * NOTE: This file is a hand-seeded snapshot. It will be REPLACED by the
+ * generated output of `packages/tokens`. Do not hand-edit values here.
+ */
+:root {
+  --brand-ink: #0B1220;
+  --ink-2: #111C33;
+  --primary: #2E6FF2;
+  --teal: #17C3A2;
+  --bg: #F6F8FC;
+  --card: #FFFFFF;
+  --card-2: #F8FAFD;
+  --text: #334155;
+  --strong: #0B1220;
+  --muted: #586275;
+  --line: #E2E8F0;
+  --radius: 16px;
+  --font-display: "Space Grotesk";
+  --font-body: "Manrope";
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0B1220;
+    --card: #111C33;
+    --card-2: #0E1830;
+    --text: #C7D2E3;
+    --strong: #F1F5F9;
+    --muted: #93A1BC;
+    --line: #22304D;
+  }
+}

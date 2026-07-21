@@ -1,0 +1,7 @@
+{
+  "font": {
+    "$type": "fontFamily",
+    "display": { "$value": "Space Grotesk" },
+    "body": { "$value": "Manrope" }
+  }
+}

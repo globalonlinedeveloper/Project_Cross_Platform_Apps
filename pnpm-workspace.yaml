@@ -1,0 +1,4 @@
+# JS/TS workspace (pnpm) — Dart lives in the separate pub/Melos workspace (pubspec.yaml).
+# Members grow as services/ and more sites join; packages/tokens is hermetic npm (not here).
+packages:
+  - 'sites/_shared'

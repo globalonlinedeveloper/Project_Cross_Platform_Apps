@@ -1,0 +1,19 @@
+---
+layout: base.njk
+title: Apps
+description: Small, focused apps built by NIKATRU — starting with Subly.
+permalink: "/index.html"
+---
+<section class="hero">
+  <h1>Apps by {{ site.name }}</h1>
+  <p class="lede">This demo page exercises the shared layer: base layout, SEO partial, design tokens, and the app registry in <code>_data/apps.json</code>.</p>
+</section>
+
+<section id="apps" aria-labelledby="apps-heading">
+  <h2 id="apps-heading" class="visually-hidden">All apps</h2>
+  <ul class="app-grid" role="list">
+    {%- for app in apps %}
+    <li>{% include "partials/app-card.njk" %}</li>
+    {%- endfor %}
+  </ul>
+</section>

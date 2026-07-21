@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="{{ lang or site.lang or 'en' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>{% if title %}{{ title }} · {{ site.name }}{% else %}{{ site.name }} · {{ site.tagline }}{% endif %}</title>
+  <meta name="description" content="{{ description or site.description }}">
+  <link rel="stylesheet" href="{{ tokensHref or '/assets/tokens.css' }}">
+  <link rel="stylesheet" href="{{ baseCssHref or '/assets/base.css' }}">
+  {%- include "partials/seo.njk" %}
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="{{ site.name }} home">{{ site.name }}</a>
+    <nav class="site-nav" aria-label="Primary">
+      <ul role="list">
+        {%- for item in site.nav %}
+        <li><a href="{{ item.href }}">{{ item.label }}</a></li>
+        {%- endfor %}
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    {{ content | safe }}
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; {% year %} {{ site.name }} · {{ site.tagline }}</p>
+  </footer>
+</body>
+</html>

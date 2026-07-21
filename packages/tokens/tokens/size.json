@@ -1,0 +1,5 @@
+{
+  "size": {
+    "radius": { "$value": "16px", "$type": "dimension" }
+  }
+}
