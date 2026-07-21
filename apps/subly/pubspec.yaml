@@ -13,13 +13,13 @@ dependencies:
 
   # Shared core domain layer (models, Result/Failure, content packs).
   nikatru_core:
-    path: ../packages/core
+    path: ../../packages/core
   nikatru_api_client:
-    path: ../packages/api_client
+    path: ../../packages/api_client
 
   # Shared design system (tokens, theming, adaptive AppScaffold).
   nikatru_design_system:
-    path: ../packages/design_system
+    path: ../../packages/design_system
 
   # State management
   flutter_riverpod: ^2.5.0
