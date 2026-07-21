@@ -1,0 +1,20 @@
+name: nikatru_api_client
+description: >-
+  Auth-agnostic HTTP client for NIKATRU app backends (Cloudflare Workers).
+  Wraps Dio behind the ApiClient seam; callers inject a base URL and a token
+  provider — no auth SDK or app-config dependency.
+version: 0.1.0
+publish_to: none
+repository: https://github.com/globalonlinedeveloper/Project_Cross_Platform_Apps
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  dio: ^5.4.0
+  nikatru_core:
+    path: ../core
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.25.0

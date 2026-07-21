@@ -1,0 +1,14 @@
+name: nikatru_core
+description: >-
+  Core domain layer for NIKATRU apps — data models, a Result/Failure type and a
+  content-pack loader. Pure Dart, framework-agnostic (no Flutter dependency).
+version: 0.1.0
+publish_to: none
+repository: https://github.com/globalonlinedeveloper/Project_Cross_Platform_Apps
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.25.0
