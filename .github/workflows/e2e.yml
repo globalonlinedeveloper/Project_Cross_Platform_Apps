@@ -54,7 +54,7 @@ jobs:
 
       - name: flutter pub get
         if: steps.pre.outputs.run == 'true'
-        working-directory: app
+        working-directory: apps/subly
         run: flutter pub get
 
       - name: Provision throwaway confirmed user
@@ -67,7 +67,7 @@ jobs:
 
       - name: Run integration tests (headless Chrome)
         if: steps.pre.outputs.run == 'true'
-        working-directory: app
+        working-directory: apps/subly
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
@@ -111,7 +111,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: e2e-screenshots
-          path: app/screenshots/
+          path: apps/subly/screenshots/
           if-no-files-found: warn
 
       - name: Purge test data (always — keep prod pristine)

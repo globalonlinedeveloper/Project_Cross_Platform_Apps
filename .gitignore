@@ -12,8 +12,8 @@
 secrets.*
 
 # ── App live config (dart-define-from-file; non-secret but env-specific) ──
-app/config/*.json
-!app/config/*.example.json
+apps/subly/config/*.json
+!apps/subly/config/*.example.json
 
 # ── Flutter / Dart (GLOBAL — survives app/→apps/ move) ──
 **/.dart_tool/

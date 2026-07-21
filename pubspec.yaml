@@ -1,7 +1,7 @@
 name: nikatru_workspace
 description: >-
   Nikatru Cross Platform Apps — monorepo workspace root (Dart pub workspaces +
-  Melos 8). Members: shared packages under packages/. The Subly app (app/)
+  Melos 8). Members: shared packages under packages/. The Subly app (apps/subly/)
   stays a standalone package until P0.6 relocates it to apps/subly.
 publish_to: none
 
