@@ -46,5 +46,10 @@
   "triggers": {
     // ONE nightly cron for the whole portfolio (06:00 UTC).
     "crons": ["0 6 * * *"]
-  }
+  },
+  "routes": [
+    // Serve CFG-1 on the portfolio config host. custom_domain auto-provisions
+    // the DNS record + edge cert (nikatru.com is a zone in this account).
+    { "pattern": "config.nikatru.com", "custom_domain": true }
+  ]
 }
