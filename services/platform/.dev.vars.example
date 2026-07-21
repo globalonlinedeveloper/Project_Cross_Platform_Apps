@@ -1,0 +1,3 @@
+# Copy to .dev.vars (gitignored) for `wrangler dev`. LOCAL dev secrets only.
+# The platform config endpoint is public (no secrets required). Reserved for
+# future authenticated platform admin routes.
