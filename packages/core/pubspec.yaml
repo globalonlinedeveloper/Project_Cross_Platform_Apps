@@ -4,6 +4,7 @@ description: >-
   content-pack loader. Pure Dart, framework-agnostic (no Flutter dependency).
 version: 0.1.0
 publish_to: none
+resolution: workspace
 repository: https://github.com/globalonlinedeveloper/Project_Cross_Platform_Apps
 
 environment:
