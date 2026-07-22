@@ -19,9 +19,4 @@ void main() {
     expect(r.fold((int v) => v, (Failure f) => -1), 5);
     expect(r.isOk, isTrue);
   });
-
-  test('content-pack loader stub returns the empty pack', () async {
-    final Result<ContentPack> r = await const ContentPackLoader().load('en');
-    expect(r.fold((ContentPack p) => p.locale, (Failure f) => 'err'), 'en');
-  });
 }

@@ -10,6 +10,12 @@ repository: https://github.com/globalonlinedeveloper/Project_Cross_Platform_Apps
 environment:
   sdk: ">=3.5.0 <4.0.0"
 
+dependencies:
+  # Pure-Dart, portable (all 6 platforms incl. web), Dart-team maintained — used
+  # only for sha256 content-pack integrity. Ed25519 signature verification stays
+  # an injected seam (PackVerifier), keeping core free of signing deps (ADR 007).
+  crypto: ^3.0.0
+
 dev_dependencies:
   lints: ^6.0.0
   test: ^1.25.0

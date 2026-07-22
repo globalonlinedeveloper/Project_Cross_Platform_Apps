@@ -2,7 +2,10 @@
 /// packs. Pure Dart — safe to depend on from any app or package.
 library;
 
-export 'src/content_pack.dart';
+export 'src/content/content_pack.dart';
+export 'src/content/content_pack_loader.dart';
+export 'src/content/content_pack_source.dart';
+export 'src/content/pack_verifier.dart';
 export 'src/entitlement_cache.dart';
 export 'src/result.dart';
 export 'src/config/app_config.dart';
