@@ -22,6 +22,16 @@ class Entitlement {
             ? null
             : DateTime.tryParse(j['expires_at'] as String),
       );
+
+  /// Snake_case JSON that round-trips through [Entitlement.fromJson] — used to
+  /// persist the entitlement cache (so a paid user stays unlocked offline).
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'entitlement': entitlement,
+        'product_id': productId,
+        'store': store,
+        'is_active': isActive,
+        'expires_at': expiresAt?.toIso8601String(),
+      };
 }
 
 /// The current user's entitlements for THIS app (from the shared platform DB).
@@ -43,6 +53,14 @@ class Entitlements {
             .map((dynamic e) => Entitlement.fromJson(e as Map<String, dynamic>))
             .toList(),
       );
+
+  /// Snake_case JSON that round-trips through [Entitlements.fromJson] — the
+  /// serialized shape the entitlement cache persists to a [SecureStore].
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'app_id': appId,
+        'is_pro': isPro,
+        'entitlements': items.map((Entitlement e) => e.toJson()).toList(),
+      };
 
   static const Entitlements none =
       Entitlements(appId: '', isPro: false, items: <Entitlement>[]);

@@ -12,3 +12,5 @@ export 'src/models/budget_info.dart';
 export 'src/models/entitlement.dart';
 export 'src/models/payment_record.dart';
 export 'src/models/subscription.dart';
+export 'src/storage/key_value_store.dart';
+export 'src/storage/secure_store.dart';
