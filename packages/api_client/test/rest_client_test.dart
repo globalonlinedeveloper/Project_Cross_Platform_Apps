@@ -1,0 +1,99 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:dio/dio.dart';
+import 'package:nikatru_api_client/nikatru_api_client.dart';
+import 'package:test/test.dart';
+
+/// A dio adapter that returns a fixed body/status and records the last request.
+class _FakeAdapter implements HttpClientAdapter {
+  _FakeAdapter(this.body, {this.status = 200});
+
+  final String body;
+  final int status;
+  RequestOptions? lastRequest;
+
+  @override
+  void close({bool force = false}) {}
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    lastRequest = options;
+    return ResponseBody.fromString(
+      body,
+      status,
+      headers: <String, List<String>>{
+        Headers.contentTypeHeader: <String>['application/json'],
+      },
+    );
+  }
+}
+
+RestClient _client(_FakeAdapter adapter, {Future<String?> Function()? token}) {
+  final Dio dio = Dio()..httpClientAdapter = adapter;
+  return RestClient(
+    baseUrl: 'https://example.test/v1',
+    tokenProvider: token ?? () async => null,
+    httpClient: dio,
+  );
+}
+
+void main() {
+  test('attaches the bearer token and returns the decoded body', () async {
+    final _FakeAdapter adapter =
+        _FakeAdapter(jsonEncode(<String, dynamic>{'ok': true}));
+    final RestClient client = _client(adapter, token: () async => 'tok123');
+
+    final dynamic data = await client.get('/health');
+    expect((data as Map<String, dynamic>)['ok'], isTrue);
+    expect(adapter.lastRequest!.headers['Authorization'], 'Bearer tok123');
+  });
+
+  test('omits the Authorization header when there is no token', () async {
+    final _FakeAdapter adapter = _FakeAdapter(jsonEncode(<String, dynamic>{}));
+    final RestClient client = _client(adapter);
+    await client.get('/health');
+    expect(adapter.lastRequest!.headers.containsKey('Authorization'), isFalse);
+  });
+
+  test('sends a JSON body on post', () async {
+    final _FakeAdapter adapter =
+        _FakeAdapter(jsonEncode(<String, dynamic>{'id': '1'}));
+    final RestClient client = _client(adapter);
+    await client.post('/things', body: <String, dynamic>{'name': 'x'});
+    expect(adapter.lastRequest!.data, <String, dynamic>{'name': 'x'});
+  });
+
+  test('maps a non-2xx response to ApiException carrying the error message',
+      () {
+    final _FakeAdapter adapter = _FakeAdapter(
+      jsonEncode(<String, dynamic>{'error': 'nope'}),
+      status: 400,
+    );
+    final RestClient client = _client(adapter);
+    expect(
+      client.get('/things'),
+      throwsA(isA<ApiException>()
+          .having((ApiException e) => e.statusCode, 'statusCode', 400)
+          .having((ApiException e) => e.message, 'message', 'nope')),
+    );
+  });
+
+  test('decode passes a good value through and maps parse failures', () {
+    final RestClient client =
+        _client(_FakeAdapter(jsonEncode(<String, dynamic>{})));
+    // Good parse returns the value.
+    expect(
+        client.decode(<dynamic>[1, 2], (Object? b) => (b! as List).length), 2);
+    // A wrong-shape parse throws ApiException(0, ...), not a raw TypeError.
+    expect(
+      () => client.decode(<String, dynamic>{}, (Object? b) => b! as List),
+      throwsA(isA<ApiException>()
+          .having((ApiException e) => e.statusCode, 'statusCode', 0)),
+    );
+  });
+}
