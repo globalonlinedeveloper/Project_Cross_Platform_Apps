@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:convert';
+
 import '../result.dart';
+import '../storage/key_value_store.dart';
 import 'app_config.dart';
 import 'default_configs.dart';
 
@@ -11,20 +15,66 @@ abstract interface class ConfigTransport {
   Future<Result<Map<String, Object?>>> fetch(String appId);
 }
 
-/// In-memory best-known config per app, seeded from the compiled-in defaults.
+/// Best-known config per app, seeded from the compiled-in defaults. Reads are
+/// synchronous (in-memory) so `peek`/`load` never block; when a [KeyValueStore]
+/// is supplied the last-good value ALSO persists across restarts (ADR 005).
+///
 /// A successful fetch updates the entry; reads fall back to the bundled default.
 class ConfigCache {
-  ConfigCache({Map<String, AppConfig>? seed})
-      : _store = <String, AppConfig>{...?seed};
+  ConfigCache({
+    Map<String, AppConfig>? seed,
+    KeyValueStore? store,
+    String keyPrefix = 'nikatru.cfg.',
+  })  : _store = <String, AppConfig>{...?seed},
+        _persist = store,
+        _keyPrefix = keyPrefix;
 
   final Map<String, AppConfig> _store;
+  final KeyValueStore? _persist;
+  final String _keyPrefix;
 
   /// Best-known config for [appId]: last successful fetch, else the compiled-in
   /// default, else null for an unregistered app.
   AppConfig? get(String appId) => _store[appId] ?? defaultConfigFor(appId);
 
-  /// Record a freshly fetched config as the new last-good value.
-  void put(AppConfig config) => _store[config.appId] = config;
+  /// Record a freshly fetched config as the new last-good value. With a backing
+  /// [KeyValueStore] the value is also written through to durable storage,
+  /// fire-and-forget: the in-memory value is authoritative for the session and
+  /// config resolution must never block on disk.
+  void put(AppConfig config) {
+    _store[config.appId] = config;
+    final KeyValueStore? persist = _persist;
+    if (persist != null) {
+      // Best-effort + fault-isolated: a failed disk write must not surface as an
+      // unhandled zone error (the in-memory value already succeeded).
+      unawaited(persist
+          .write('$_keyPrefix${config.appId}', jsonEncode(config.toJson()))
+          .catchError((Object _) {}));
+    }
+  }
+
+  /// Load persisted last-good configs for [appIds] into memory. Call once at
+  /// startup — BEFORE the first [ConfigLoader.peek]/`load` — so a relaunched app
+  /// resolves its last-good config synchronously and offline. A corrupt persisted
+  /// entry is skipped (the bundled default still applies). No-op without a store.
+  Future<void> hydrate(Iterable<String> appIds) async {
+    final KeyValueStore? persist = _persist;
+    if (persist == null) return;
+    for (final String appId in appIds) {
+      final String? raw = await persist.read('$_keyPrefix$appId');
+      if (raw == null) continue;
+      try {
+        final Object? decoded = jsonDecode(raw);
+        if (decoded is Map) {
+          _store[appId] = AppConfig.fromJson(decoded.cast<String, Object?>());
+        }
+      } catch (_) {
+        // Corrupt/tampered cache entry (bad JSON, wrong shape, or a wrong-typed
+        // field) — ignore; the bundled default remains available. A corrupt
+        // cache must never crash startup (matches EntitlementCache.readRaw).
+      }
+    }
+  }
 }
 
 /// Loads runtime config for an app: network first, then the last-good cache,

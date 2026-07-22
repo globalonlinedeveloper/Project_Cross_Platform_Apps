@@ -79,7 +79,12 @@ class AppConfig {
       apiBaseUrl: apiBaseUrl,
       features: _boolMap(json['features']),
       paywall: PaywallConfig.fromJson(_asMap(json['paywall'])),
-      contentPack: json['content_pack'] as String?,
+      // Non-required: coerce a wrong-typed value to null rather than throwing a
+      // TypeError (only the three keys above are strict). Keeps a corrupt cached
+      // or drifted server body from crashing load()/hydrate().
+      contentPack: json['content_pack'] is String
+          ? json['content_pack'] as String
+          : null,
       copy: _stringMap(json['copy']),
       minSupportedVersion: minVer,
       theme: json['theme'] == null ? null : _asMap(json['theme']),

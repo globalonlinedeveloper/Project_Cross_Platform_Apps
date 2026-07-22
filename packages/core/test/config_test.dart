@@ -21,7 +21,9 @@ Map<String, Object?> sublyServerJson() => <String, Object?>{
 /// a JSON body or failing; switch mid-test with [succeedWith] / [failWith].
 class FakeTransport implements ConfigTransport {
   FakeTransport.ok(this._json);
-  FakeTransport.offline() : _json = null, _failure = const Failure('offline');
+  FakeTransport.offline()
+      : _json = null,
+        _failure = const Failure('offline');
 
   Map<String, Object?>? _json;
   Failure? _failure;
@@ -63,7 +65,8 @@ void main() {
     });
 
     test('round-trips through toJson with snake_case keys', () {
-      final Map<String, Object?> j = AppConfig.fromJson(sublyServerJson()).toJson();
+      final Map<String, Object?> j =
+          AppConfig.fromJson(sublyServerJson()).toJson();
       expect(j.containsKey('api_base_url'), isTrue);
       expect(j.containsKey('min_supported_version'), isTrue);
       final AppConfig again = AppConfig.fromJson(j);
@@ -84,6 +87,15 @@ void main() {
     test('throws FormatException when api_base_url is missing', () {
       final Map<String, Object?> j = sublyServerJson()..remove('api_base_url');
       expect(() => AppConfig.fromJson(j), throwsFormatException);
+    });
+
+    test('coerces a wrong-typed content_pack to null (non-required, lenient)',
+        () {
+      // A non-string content_pack must not throw a TypeError — only app_id,
+      // api_base_url and min_supported_version are strict.
+      final Map<String, Object?> j = sublyServerJson()..['content_pack'] = 123;
+      final AppConfig c = AppConfig.fromJson(j);
+      expect(c.contentPack, isNull);
     });
 
     test('feature() and text() honor their fallbacks', () {
@@ -129,7 +141,8 @@ void main() {
       expect(t.calls, 1);
     });
 
-    test('falls back to the bundled default when offline (offline-safe)', () async {
+    test('falls back to the bundled default when offline (offline-safe)',
+        () async {
       final FakeTransport t = FakeTransport.offline();
       final ConfigLoader loader = ConfigLoader(transport: t);
       final Result<AppConfig> r = await loader.load('subly');
@@ -154,11 +167,13 @@ void main() {
       expect(second.isOk, isTrue);
       expect(second.fold((AppConfig c) => c.apiBaseUrl, (_) => 'err'),
           'https://api-canary.nikatru.com/v1');
-      expect(second.fold((AppConfig c) => c.paywall.enabled, (_) => false), isTrue);
+      expect(second.fold((AppConfig c) => c.paywall.enabled, (_) => false),
+          isTrue);
     });
 
     test('falls back to the default when the body is malformed', () async {
-      final FakeTransport t = FakeTransport.ok(<String, Object?>{'nonsense': 1});
+      final FakeTransport t =
+          FakeTransport.ok(<String, Object?>{'nonsense': 1});
       final ConfigLoader loader = ConfigLoader(transport: t);
       final Result<AppConfig> r = await loader.load('subly');
       expect(r.isOk, isTrue);

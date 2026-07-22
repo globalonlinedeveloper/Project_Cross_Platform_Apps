@@ -3,6 +3,7 @@
 library;
 
 export 'src/content_pack.dart';
+export 'src/entitlement_cache.dart';
 export 'src/result.dart';
 export 'src/config/app_config.dart';
 export 'src/config/config_loader.dart';

@@ -30,8 +30,20 @@ class Entitlement {
         'product_id': productId,
         'store': store,
         'is_active': isActive,
-        'expires_at': expiresAt?.toIso8601String(),
+        // Normalize to UTC so a local DateTime round-trips to the same instant
+        // regardless of any device-timezone change between write and read.
+        'expires_at': expiresAt?.toUtc().toIso8601String(),
       };
+
+  /// Whether this entitlement should still be honoured offline at [now], given a
+  /// [grace] window after expiry. A lifetime entitlement (no [expiresAt]) never
+  /// expires; a subscription is honoured until expiry + [grace], after which the
+  /// server must reconcile on reconnect (ADR 005).
+  bool isValidAt(DateTime now, {Duration grace = Duration.zero}) {
+    if (!isActive) return false;
+    final DateTime? exp = expiresAt;
+    return exp == null || now.isBefore(exp.add(grace));
+  }
 }
 
 /// The current user's entitlements for THIS app (from the shared platform DB).
@@ -61,6 +73,15 @@ class Entitlements {
         'is_pro': isPro,
         'entitlements': items.map((Entitlement e) => e.toJson()).toList(),
       };
+
+  /// Whether the user should be treated as Pro at [now] offline: the server said
+  /// Pro AND either there are no dated line items (a lifetime grant) or at least
+  /// one item is still valid within [grace]. Lifetime grants stay Pro forever
+  /// offline; expired subscriptions drop to not-Pro past the grace window (ADR 005).
+  bool isProAt(DateTime now, {Duration grace = Duration.zero}) =>
+      isPro &&
+      (items.isEmpty ||
+          items.any((Entitlement e) => e.isValidAt(now, grace: grace)));
 
   static const Entitlements none =
       Entitlements(appId: '', isPro: false, items: <Entitlement>[]);
