@@ -43,7 +43,9 @@ coverage/
 
 # ── Pub workspace root artifacts ──
 /.dart_tool/
-/pubspec.lock
+# Root workspace lock IS committed (reproducible app builds; apps/subly is a
+# resolution: workspace member). Member locks stay ignored via **/pubspec.lock above.
+!/pubspec.lock
 
 # ── IDE / Melos ──
 /.idea/
