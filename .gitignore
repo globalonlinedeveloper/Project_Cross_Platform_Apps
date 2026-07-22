@@ -11,6 +11,19 @@
 *-service-account*.json
 secrets.*
 
+# ── Android/Apple app-signing — NEVER commit (a leaked signing key + password lets
+#    anyone publish malicious updates as you; public repo = permanent exposure) ──
+release-keystore/
+*.keystore
+*.jks
+*.p12
+key.properties
+KEYSTORE_*.txt
+KEYSTORE_B64*
+*.mobileprovision
+*.cer
+AuthKey_*.p8
+
 # ── App live config (dart-define-from-file; non-secret but env-specific) ──
 apps/subly/config/*.json
 !apps/subly/config/*.example.json
