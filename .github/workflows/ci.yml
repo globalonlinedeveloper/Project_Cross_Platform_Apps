@@ -9,22 +9,15 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-jobs:
-  flutter:
-    name: Flutter analyze (app)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/subly
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-      - run: flutter pub get
-      - run: flutter analyze --no-fatal-infos
-      - run: flutter test
+# NOTE (2026-07-22): the Dart/Flutter per-package lanes (flutter/app, core, api_client,
+# design_system, telemetry) were RETIRED — `workspace_gate` runs `melos run analyze` +
+# `melos run test` across every Dart workspace member in ONE resolution, which fully
+# covers them (analyze = dart analyze per member, infos non-fatal; test = dart test for
+# pure-Dart members + flutter test for Flutter members). The lanes below are the ones
+# workspace_gate does NOT cover: the TS Workers, the Node token/site builds, and the
+# brick-stamp validation.
 
+jobs:
   subly_api:
     name: subly-api Worker (typecheck + dry-run)
     runs-on: ubuntu-latest
@@ -72,21 +65,6 @@ jobs:
       - name: Committed token outputs must equal a fresh build
         run: git diff --exit-code -- build
 
-  telemetry:
-    name: Telemetry (analyze + test)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/telemetry
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-      - run: flutter pub get
-      - run: flutter analyze --no-fatal-infos
-      - run: flutter test
-
   site_shared:
     name: Shared site build
     runs-on: ubuntu-latest
@@ -100,51 +78,6 @@ jobs:
           node-version: 22
       - run: npm install
       - run: npm run build
-
-  design_system:
-    name: Design system (analyze + test)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/design_system
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-      - run: flutter pub get
-      - run: flutter analyze --no-fatal-infos
-      - run: flutter test
-
-  core:
-    name: Core (analyze + test)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/core
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-      - run: flutter pub get
-      - run: dart analyze
-      - run: dart test
-
-  api_client:
-    name: API client (analyze + test)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/api_client
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-      - run: flutter pub get
-      - run: dart analyze
-      - run: dart test
 
   app_brick:
     name: App brick (stamp probe + analyze app + validate service)
@@ -209,12 +142,12 @@ jobs:
   ci-gate:
     name: ci-gate
     runs-on: ubuntu-latest
-    needs: [flutter, subly_api, platform, tokens, telemetry, site_shared, core, api_client, design_system, app_brick, workspace_gate]
+    needs: [subly_api, platform, tokens, site_shared, app_brick, workspace_gate]
     if: always()
     steps:
       - name: Require all lanes green
         run: |
-          echo "flutter=${{ needs.flutter.result }} subly_api=${{ needs.subly_api.result }} platform=${{ needs.platform.result }} tokens=${{ needs.tokens.result }} telemetry=${{ needs.telemetry.result }} site_shared=${{ needs.site_shared.result }}"
+          echo "subly_api=${{ needs.subly_api.result }} platform=${{ needs.platform.result }} tokens=${{ needs.tokens.result }} site_shared=${{ needs.site_shared.result }} app_brick=${{ needs.app_brick.result }} workspace_gate=${{ needs.workspace_gate.result }}"
           if [ "${{ contains(needs.*.result, 'failure') }}" = "true" ] || [ "${{ contains(needs.*.result, 'cancelled') }}" = "true" ]; then
             echo "::error::One or more CI lanes failed"; exit 1
           fi
