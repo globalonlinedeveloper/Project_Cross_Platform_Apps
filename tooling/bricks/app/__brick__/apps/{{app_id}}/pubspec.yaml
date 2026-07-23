@@ -28,6 +28,9 @@ dependencies:
   # Launch external URLs (support mailto, legal links) — all 6 platforms.
   url_launcher: ^6.3.0
 
+  # HTTP for the CFG-1 runtime-config transport (matches the shared spine client).
+  dio: ^5.4.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
