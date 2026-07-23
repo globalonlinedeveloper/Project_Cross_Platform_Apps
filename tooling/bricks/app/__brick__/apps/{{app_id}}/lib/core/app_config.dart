@@ -31,6 +31,13 @@ class AppConfig {
     defaultValue: 'https://config.nikatru.com',
   );
 
+  // Where the force-update screen sends users (store listing / download page).
+  // Owner overrides per platform via --dart-define=UPDATE_URL.
+  static const String updateUrl = String.fromEnvironment(
+    'UPDATE_URL',
+    defaultValue: companyUrl,
+  );
+
   // Shared Supabase auth (portfolio-wide).
   static const String supabaseUrl = String.fromEnvironment(
     'SUPABASE_URL',
