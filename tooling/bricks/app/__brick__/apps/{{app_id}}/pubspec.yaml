@@ -20,6 +20,8 @@ dependencies:
     path: ../../packages/design_system
   nikatru_telemetry:
     path: ../../packages/telemetry
+  nikatru_platform_storage:
+    path: ../../packages/platform_storage
 
   # State (Riverpod 2.x-LTS, non-codegen — locked chassis choice) + routing.
   flutter_riverpod: ^2.5.0

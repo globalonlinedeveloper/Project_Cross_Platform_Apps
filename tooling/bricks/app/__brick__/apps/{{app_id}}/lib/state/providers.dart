@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nikatru_core/nikatru_core.dart' as core;
+import 'package:nikatru_platform_storage/nikatru_platform_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../core/app_config.dart';
@@ -76,3 +79,52 @@ final Provider<bool> mustForceUpdateProvider = Provider<bool>((ref) {
   if (cfg == null || version == null) return false;
   return core.mustForceUpdate(version, cfg.minSupportedVersion);
 });
+
+// ── Persistence (G-2): concrete plugin adapters from platform_storage; core
+//    stays pure Dart. Async — the stores create off the platform. ──
+
+/// Non-secret key-value store (prefs, the flag install-id, last-good config).
+final FutureProvider<core.KeyValueStore> keyValueStoreProvider =
+    FutureProvider<core.KeyValueStore>((ref) => PrefsKeyValueStore.create());
+
+/// Secure store (auth tokens, the entitlement cache).
+final Provider<core.SecureStore> secureStoreProvider =
+    Provider<core.SecureStore>((ref) => FlutterSecureStore());
+
+const String _installIdKey = 'nikatru.install_id';
+
+/// A stable, persisted per-install id for deterministic feature-flag bucketing.
+/// Generated once (secure random), then the same id returns on every launch so a
+/// device's rollout decision never changes underfoot.
+final FutureProvider<String> installIdProvider = FutureProvider<String>((
+  ref,
+) async {
+  final core.KeyValueStore kv = await ref.watch(keyValueStoreProvider.future);
+  final String? existing = await kv.read(_installIdKey);
+  if (existing != null && existing.isNotEmpty) return existing;
+  final String id = _generateInstallId();
+  await kv.write(_installIdKey, id);
+  return id;
+});
+
+/// Resolved feature flags for this install: `AppConfig.flags` (rollout percents)
+/// bound to the persisted install id. Callers ask `.isOn('flag')`.
+final FutureProvider<core.FeatureFlags> featureFlagsProvider =
+    FutureProvider<core.FeatureFlags>((ref) async {
+      final core.AppConfig cfg = await ref.watch(appConfigProvider.future);
+      final String id = await ref.watch(installIdProvider.future);
+      return core.FeatureFlags(rollouts: cfg.flags, stableId: id);
+    });
+
+/// The offline entitlement cache (SecureStore-backed): a paid user stays
+/// unlocked across restarts; honours expires_at + a grace window (ADR 005).
+final Provider<core.EntitlementCache> entitlementCacheProvider =
+    Provider<core.EntitlementCache>(
+      (ref) => core.EntitlementCache(store: ref.watch(secureStoreProvider)),
+    );
+
+String _generateInstallId() {
+  final Random rng = Random.secure();
+  final List<int> bytes = List<int>.generate(16, (_) => rng.nextInt(256));
+  return bytes.map((int b) => b.toRadixString(16).padLeft(2, '0')).join();
+}
