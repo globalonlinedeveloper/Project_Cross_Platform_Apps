@@ -31,6 +31,9 @@ dependencies:
   # HTTP for the CFG-1 runtime-config transport (matches the shared spine client).
   dio: ^5.4.0
 
+  # Running app version — drives the CFG-1 force-update kill-switch.
+  package_info_plus: ^8.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
