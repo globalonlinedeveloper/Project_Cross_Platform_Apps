@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'core/app_config.dart';
 import 'core/router.dart';
+import 'l10n/app_localizations.dart';
 import 'state/providers.dart';
 
 /// Root widget for {{display_name}}.
@@ -21,6 +22,8 @@ class {{app_id.pascalCase()}}App extends ConsumerWidget {
     return MaterialApp.router(
       title: AppConfig.appName,
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: buildAppTheme(seed: const Color(0xFF{{{seed_hex}}})),
       darkTheme: buildAppTheme(
         seed: const Color(0xFF{{{seed_hex}}}),

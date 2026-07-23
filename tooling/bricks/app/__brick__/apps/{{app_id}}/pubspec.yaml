@@ -36,6 +36,11 @@ dependencies:
   # Running app version — drives the CFG-1 force-update kill-switch.
   package_info_plus: ^8.0.0
 
+  # Localization — flutter_localizations + intl drive gen-l10n from lib/l10n/*.arb.
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -43,3 +48,4 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true

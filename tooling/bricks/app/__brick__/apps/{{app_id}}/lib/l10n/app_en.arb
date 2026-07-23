@@ -1,0 +1,19 @@
+{
+  "@@locale": "en",
+  "appTitle": "{{display_name}}",
+  "@appTitle": {
+    "description": "The application title shown in the OS task switcher."
+  },
+  "settingsTitle": "Settings",
+  "@settingsTitle": {
+    "description": "Title of the settings screen."
+  },
+  "contactSupport": "Contact support",
+  "@contactSupport": {
+    "description": "Settings entry that opens a support email."
+  },
+  "deleteAccount": "Delete account",
+  "@deleteAccount": {
+    "description": "Settings entry to delete the account and its data."
+  }
+}

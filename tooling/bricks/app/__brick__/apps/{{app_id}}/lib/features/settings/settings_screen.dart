@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_config.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Settings — carries the chassis-mandated support contact (E1) and the
 /// in-app account-deletion entry (G2). The Worker-side delete route is wired
@@ -11,20 +12,21 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: ListView(
         children: <Widget>[
           ListTile(
             leading: const Icon(Icons.mail_outline),
-            title: const Text('Contact support'),
+            title: Text(l10n.contactSupport),
             subtitle: const Text(AppConfig.supportEmail),
             trailing: const Icon(Icons.open_in_new, size: 18),
             onTap: _contactSupport,
           ),
           ListTile(
             leading: const Icon(Icons.delete_outline),
-            title: const Text('Delete account'),
+            title: Text(l10n.deleteAccount),
             subtitle: const Text('Permanently delete your account and data'),
             onTap: () => _confirmDelete(context),
           ),
