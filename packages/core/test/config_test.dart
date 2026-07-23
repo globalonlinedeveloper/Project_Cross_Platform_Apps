@@ -111,6 +111,15 @@ void main() {
       expect(
           AppConfig.fromJson(sublyServerJson()).toJson().containsKey('flags'),
           isFalse);
+      // lenient/fail-safe: a wrong-typed value drops to 0 (off), a non-map
+      // flags block parses to empty — a garbled percent can never ship a flag.
+      expect(
+          AppConfig.fromJson(
+                  sublyServerJson()..['flags'] = <String, Object?>{'x': '50'})
+              .rolloutPercent('x'),
+          0);
+      expect(AppConfig.fromJson(sublyServerJson()..['flags'] = 'nope').flags,
+          isEmpty);
     });
 
     test('feature() and text() honor their fallbacks', () {
