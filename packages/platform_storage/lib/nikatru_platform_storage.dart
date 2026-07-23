@@ -3,4 +3,5 @@
 /// app/brick layer so `packages/core` stays pure Dart (ADR 005).
 library;
 
+export 'src/flutter_secure_store.dart';
 export 'src/prefs_key_value_store.dart';
