@@ -1,0 +1,27 @@
+name: nikatru_platform_storage
+description: >-
+  Concrete, plugin-backed implementations of the NIKATRU core storage seams
+  (KeyValueStore, SecureStore) for all six platforms. Keeps packages/core pure
+  Dart while apps get real persistence via one shared dependency (ADR 005).
+version: 0.1.0
+publish_to: none
+resolution: workspace
+repository: https://github.com/globalonlinedeveloper/Project_Cross_Platform_Apps
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  nikatru_core:
+    path: ../core
+  # Non-secret key-value persistence (prefs, flags, last-good config) — all 6
+  # platforms. Secrets/tokens use a SecureStore impl instead.
+  shared_preferences: ^2.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
