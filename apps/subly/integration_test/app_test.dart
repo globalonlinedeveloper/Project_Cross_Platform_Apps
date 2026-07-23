@@ -51,8 +51,11 @@ void main() {
 
   // Poll for a finder to appear — SnackBars auto-dismiss at 4s, so we assert
   // the instant one shows instead of racing its timeout with a fixed pump.
-  Future<bool> waitFor(WidgetTester tester, Finder f,
-      {Duration timeout = const Duration(seconds: 12)}) async {
+  Future<bool> waitFor(
+    WidgetTester tester,
+    Finder f, {
+    Duration timeout = const Duration(seconds: 12),
+  }) async {
     final DateTime end = DateTime.now().add(timeout);
     while (DateTime.now().isBefore(end)) {
       await tester.pump(const Duration(milliseconds: 200));
@@ -63,8 +66,9 @@ void main() {
 
   Future<void> shot(String name) => binding.takeScreenshot(name);
 
-  testWidgets('login rejects empty + invalid credentials with clear messages',
-      (WidgetTester tester) async {
+  testWidgets('login rejects empty + invalid credentials with clear messages', (
+    WidgetTester tester,
+  ) async {
     await app.main();
     await pumpFor(tester, const Duration(seconds: 3));
 
@@ -78,31 +82,42 @@ void main() {
 
     // Empty submit → inline validation, no network round-trip.
     await tester.tap(find.byKey(E2EKeys.loginSubmit));
-    expect(await waitFor(tester, find.textContaining('Enter your email')), isTrue,
-        reason: 'empty-field validation message did not appear');
+    expect(
+      await waitFor(tester, find.textContaining('Enter your email')),
+      isTrue,
+      reason: 'empty-field validation message did not appear',
+    );
     await shot('00b-empty-validation');
 
     // Wrong credentials → friendly message, stays on the login screen.
     final int ts = DateTime.now().millisecondsSinceEpoch;
     await tester.enterText(
-        find.byKey(E2EKeys.loginEmail), 'nobody-$ts@nikatru.com');
+      find.byKey(E2EKeys.loginEmail),
+      'nobody-$ts@nikatru.com',
+    );
     await tester.enterText(
-        find.byKey(E2EKeys.loginPassword), 'wrong-password-123');
+      find.byKey(E2EKeys.loginPassword),
+      'wrong-password-123',
+    );
     await pumpFor(tester, const Duration(milliseconds: 300));
     await tester.tap(find.byKey(E2EKeys.loginSubmit));
     expect(
-        await waitFor(
-            tester, find.textContaining('Incorrect email or password')),
-        isTrue,
-        reason: 'friendly invalid-credentials message did not appear');
+      await waitFor(tester, find.textContaining('Incorrect email or password')),
+      isTrue,
+      reason: 'friendly invalid-credentials message did not appear',
+    );
     expect(find.text('Welcome back'), findsOneWidget);
     await shot('00c-invalid-credentials');
   });
 
-  testWidgets('visits every page, creates a subscription, reads it back',
-      (WidgetTester tester) async {
-    expect(email, isNotEmpty,
-        reason: 'E2E_EMAIL dart-define missing — CI must provision a user');
+  testWidgets('visits every page, creates a subscription, reads it back', (
+    WidgetTester tester,
+  ) async {
+    expect(
+      email,
+      isNotEmpty,
+      reason: 'E2E_EMAIL dart-define missing — CI must provision a user',
+    );
     expect(password, isNotEmpty, reason: 'E2E_PASSWORD dart-define missing');
 
     int shellIndex() => tester
@@ -115,8 +130,11 @@ void main() {
     await pumpFor(tester, const Duration(seconds: 3));
 
     // ── 01 Onboarding ────────────────────────────────────────────────────────
-    expect(find.text('Skip'), findsOneWidget,
-        reason: 'App did not land on the onboarding screen');
+    expect(
+      find.text('Skip'),
+      findsOneWidget,
+      reason: 'App did not land on the onboarding screen',
+    );
     await shot('01-onboarding');
     await tester.tap(find.text('Skip'));
     await pumpFor(tester, const Duration(seconds: 2));
@@ -133,9 +151,13 @@ void main() {
 
     // ── 03 Scan ──────────────────────────────────────────────────────────────
     await shot('03-scan');
-    expect(find.text('Go to dashboard'), findsOneWidget,
-        reason: 'Scan never finished — sign-in likely failed (bad/unconfirmed '
-            'credentials or backend down)');
+    expect(
+      find.text('Go to dashboard'),
+      findsOneWidget,
+      reason:
+          'Scan never finished — sign-in likely failed (bad/unconfirmed '
+          'credentials or backend down)',
+    );
     await tester.tap(find.text('Go to dashboard'));
     await pumpFor(tester, const Duration(seconds: 4));
 
@@ -180,8 +202,11 @@ void main() {
     expect(shellIndex(), 0);
 
     // ── 09 Notifications (bell on Home) ──────────────────────────────────────
-    expect(await waitFor(tester, find.byIcon(Icons.notifications_none_rounded)),
-        isTrue, reason: 'notifications bell did not render on Home');
+    expect(
+      await waitFor(tester, find.byIcon(Icons.notifications_none_rounded)),
+      isTrue,
+      reason: 'notifications bell did not render on Home',
+    );
     await tester.tap(find.byIcon(Icons.notifications_none_rounded));
     await pumpFor(tester, const Duration(seconds: 2));
     expect(find.text('Notifications'), findsWidgets);
@@ -192,8 +217,7 @@ void main() {
     expect(shellIndex(), 0);
 
     // ── 10 Add-subscription sheet ────────────────────────────────────────────
-    final String subName =
-        'E2E Probe ${DateTime.now().millisecondsSinceEpoch}';
+    final String subName = 'E2E Probe ${DateTime.now().millisecondsSinceEpoch}';
     await tester.tap(find.byKey(E2EKeys.fabAdd));
     await pumpFor(tester, const Duration(seconds: 2));
     expect(find.text('Add subscription'), findsWidgets);
@@ -214,32 +238,52 @@ void main() {
       scrollable: find.byType(Scrollable).first,
       maxScrolls: 40,
     );
-    expect(subFinder, findsWidgets,
-        reason: 'The created subscription did not appear on Home — the POST or '
-            'read-back failed');
+    expect(
+      subFinder,
+      findsWidgets,
+      reason:
+          'The created subscription did not appear on Home — the POST or '
+          'read-back failed',
+    );
     await shot('11-home-after-create');
 
     // ── 12 Detail (subscription A) ───────────────────────────────────────────
     await tester.tap(subFinder.first);
     await pumpFor(tester, const Duration(seconds: 3));
-    expect(find.text(subName), findsWidgets); // sub name shown in the detail header
+    expect(
+      find.text(subName),
+      findsWidgets,
+    ); // sub name shown in the detail header
     await shot('12-detail');
 
     // ── 13 Cancel/delete A (exercises DELETE /v1/subscriptions/:id) ───────────
-    await tester.scrollUntilVisible(find.text('Cancel plan'), 200,
-        scrollable: find.byType(Scrollable).first, maxScrolls: 20);
+    await tester.scrollUntilVisible(
+      find.text('Cancel plan'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+      maxScrolls: 20,
+    );
     await tester.tap(find.text('Cancel plan'));
     await pumpFor(tester, const Duration(seconds: 2));
     expect(find.text('Confirm cancel'), findsOneWidget);
     await tester.tap(find.text('Confirm cancel'));
     await pumpFor(tester, const Duration(seconds: 8)); // DELETE round-trip
-    expect(find.text('Cancelled'), findsWidgets,
-        reason: 'Cancel confirmation never appeared — DELETE likely failed');
+    expect(
+      find.text('Cancelled'),
+      findsWidgets,
+      reason: 'Cancel confirmation never appeared — DELETE likely failed',
+    );
     await tester.tap(find.text('Done'));
-    await pumpFor(tester, const Duration(seconds: 4)); // sheet + detail pop → home
+    await pumpFor(
+      tester,
+      const Duration(seconds: 4),
+    ); // sheet + detail pop → home
     expect(shellIndex(), 0);
-    expect(find.text(subName), findsNothing,
-        reason: 'Cancelled subscription still shows on Home — delete failed');
+    expect(
+      find.text(subName),
+      findsNothing,
+      reason: 'Cancelled subscription still shows on Home — delete failed',
+    );
     await shot('13-after-cancel');
 
     // ── 14 Create a SECOND subscription (left in D1 for the CI verify+purge) ──
@@ -259,8 +303,11 @@ void main() {
       scrollable: find.byType(Scrollable).first,
       maxScrolls: 40,
     );
-    expect(subFinderB, findsWidgets,
-        reason: 'Second subscription did not round-trip to Home');
+    expect(
+      subFinderB,
+      findsWidgets,
+      reason: 'Second subscription did not round-trip to Home',
+    );
     await shot('14-second-sub');
 
     // ── 15 Settings: switch currency (client-state propagation) ──────────────
@@ -275,20 +322,32 @@ void main() {
     await tester.tap(find.text('Home'));
     await pumpFor(tester, const Duration(seconds: 2));
     expect(shellIndex(), 0);
-    expect(find.textContaining('€'), findsWidgets,
-        reason: 'Currency change did not propagate to Home');
+    expect(
+      find.textContaining('€'),
+      findsWidgets,
+      reason: 'Currency change did not propagate to Home',
+    );
     await shot('16-home-currency');
 
-    // ── 17 Sign out → back to onboarding ─────────────────────────────────────
+    // ── 17 Sign out → back to the login screen ───────────────────────────────
     await tester.tap(find.text('More'));
     await pumpFor(tester, const Duration(seconds: 2));
-    await tester.scrollUntilVisible(find.text('Log out'), 200,
-        scrollable: find.byType(Scrollable).first, maxScrolls: 20);
+    await tester.scrollUntilVisible(
+      find.text('Log out'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+      maxScrolls: 20,
+    );
     await tester.tap(find.text('Log out'));
-    // signOut() is an async network round-trip to Supabase; the router then
-    // refreshes and rebuilds onboarding. Poll instead of racing a fixed pump.
-    expect(await waitFor(tester, find.text('Skip')), isTrue,
-        reason: 'Sign-out did not return to the onboarding flow');
+    // signOut() is an async round-trip to Supabase; the router then refreshes
+    // and redirects. A signed-out user on a non-auth route (/settings) lands on
+    // /login — NOT first-run onboarding — per the app_router redirect (a
+    // signed-out user is only left on /onboarding|/login|/scan). Poll for it.
+    expect(
+      await waitFor(tester, find.text('Welcome back')),
+      isTrue,
+      reason: 'Sign-out did not return to the login screen',
+    );
     await shot('17-signed-out');
   });
 }
