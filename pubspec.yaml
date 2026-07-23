@@ -19,6 +19,7 @@ workspace:
   - packages/core
   - packages/api_client
   - packages/design_system
+  - packages/notifications
   - packages/platform_storage
   - packages/telemetry
   - apps/subly

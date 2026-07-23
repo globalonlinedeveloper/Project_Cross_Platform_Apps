@@ -26,10 +26,12 @@ class DailyReminder {
   final int minute;
 }
 
-/// Seam for local notifications. Impls schedule via the OS; **scheduled/repeating
-/// reminders are unsupported on Web and can't repeat on Windows** (per the 2026
-/// platform audit) — impls no-op scheduling there and callers fall back to an
-/// in-app catch-up nudge. Immediate [showNow] works on all six platforms.
+/// Seam for local notifications. Impls schedule via the OS, and **not every
+/// platform supports every operation** — the concrete impl reports its own
+/// capability matrix and no-ops what it can't do so a caller never crashes (e.g.
+/// the `flutter_local_notifications` adapter can't schedule on Web/Windows/Linux,
+/// nor even show on Web/Windows). Callers fall back to an in-app catch-up nudge
+/// where an operation no-ops; the [NoOpNotificationService] covers the rest.
 abstract interface class NotificationService {
   /// One-time setup (timezone db, platform channels). Safe to call more than once.
   Future<void> init();
@@ -40,7 +42,8 @@ abstract interface class NotificationService {
   /// Show a notification immediately (works on all platforms).
   Future<void> showNow({required String title, required String body});
 
-  /// Schedule [reminder] to fire daily at its local time. No-op on Web/Windows.
+  /// Schedule [reminder] to fire daily at its local time. No-op where the impl's
+  /// backend can't schedule (e.g. Web/Windows/Linux with flutter_local_notifications).
   Future<void> scheduleDaily(DailyReminder reminder);
 
   /// Cancel a scheduled notification by id.
