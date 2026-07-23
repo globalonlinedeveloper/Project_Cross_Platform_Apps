@@ -20,6 +20,9 @@ dependencies:
   # Non-secret key-value persistence (prefs, flags, last-good config) — all 6
   # platforms. Secrets/tokens use a SecureStore impl instead.
   shared_preferences: ^2.2.0
+  # Secret persistence (auth tokens, entitlement cache): OS Keychain/Keystore/
+  # DPAPI, libsecret on Linux, WebCrypto on web.
+  flutter_secure_storage: ^9.0.0
 
 dev_dependencies:
   flutter_test:
