@@ -29,3 +29,24 @@ int flagBucket({required String flag, required String stableId}) {
   final int v = ((h[0] << 24) | (h[1] << 16) | (h[2] << 8) | h[3]) & 0x7fffffff;
   return v % 100;
 }
+
+/// Binds a per-app rollout map (`flag → percent`, e.g. `AppConfig.flags`) to a
+/// stable device/install id, so callers ask `isOn('newHome')` without threading
+/// the id and percentage through every call site.
+class FeatureFlags {
+  const FeatureFlags({required this.rollouts, required this.stableId});
+
+  /// Flag → rollout percentage (0..100).
+  final Map<String, int> rollouts;
+
+  /// A stable per-device/install id — the same value across launches so a
+  /// device's rollout decision never changes underfoot.
+  final String stableId;
+
+  /// Whether [flag] is rolled out to this device (an absent flag ⇒ off).
+  bool isOn(String flag) => resolveFlag(
+        flag: flag,
+        rolloutPercent: rollouts[flag] ?? 0,
+        stableId: stableId,
+      );
+}

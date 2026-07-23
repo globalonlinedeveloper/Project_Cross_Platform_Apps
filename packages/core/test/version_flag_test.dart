@@ -82,6 +82,16 @@ void main() {
       }
     });
 
+    test('FeatureFlags binds a rollout map + stable id', () {
+      const FeatureFlags off =
+          FeatureFlags(rollouts: <String, int>{'f': 0}, stableId: 'd');
+      const FeatureFlags on =
+          FeatureFlags(rollouts: <String, int>{'f': 100}, stableId: 'd');
+      expect(off.isOn('f'), isFalse);
+      expect(on.isOn('f'), isTrue);
+      expect(on.isOn('absent'), isFalse); // absent flag ⇒ off
+    });
+
     test('~splits the population at the configured percent (deterministic)',
         () {
       int on = 0;

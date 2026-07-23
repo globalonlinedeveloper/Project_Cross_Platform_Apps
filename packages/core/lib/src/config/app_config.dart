@@ -37,6 +37,7 @@ class AppConfig {
     required this.contentPack,
     required this.copy,
     required this.minSupportedVersion,
+    this.flags = const <String, int>{},
     this.theme,
   });
 
@@ -47,10 +48,18 @@ class AppConfig {
   final String? contentPack;
   final Map<String, String> copy;
   final String minSupportedVersion;
+
+  /// Percentage-rollout flags (`name → 0..100`), resolved per-device with
+  /// `FeatureFlags`/`resolveFlag` (CFG G-14). Distinct from [features], which is
+  /// a hard on/off toggle.
+  final Map<String, int> flags;
   final Map<String, Object?>? theme;
 
   /// Whether feature [key] is enabled ([orElse] when the key is absent).
   bool feature(String key, {bool orElse = false}) => features[key] ?? orElse;
+
+  /// The rollout percentage (0..100) for [flag], or 0 (off) when absent.
+  int rolloutPercent(String flag) => flags[flag] ?? 0;
 
   /// Override copy for [key], or [key] itself when absent.
   String text(String key) => copy[key] ?? key;
@@ -87,6 +96,7 @@ class AppConfig {
           : null,
       copy: _stringMap(json['copy']),
       minSupportedVersion: minVer,
+      flags: _intMap(json['flags']),
       theme: json['theme'] == null ? null : _asMap(json['theme']),
     );
   }
@@ -99,6 +109,7 @@ class AppConfig {
         'content_pack': contentPack,
         'copy': copy,
         'min_supported_version': minSupportedVersion,
+        if (flags.isNotEmpty) 'flags': flags,
         if (theme != null) 'theme': theme,
       };
 
@@ -110,6 +121,7 @@ class AppConfig {
     String? contentPack,
     Map<String, String>? copy,
     String? minSupportedVersion,
+    Map<String, int>? flags,
     Map<String, Object?>? theme,
   }) =>
       AppConfig(
@@ -120,6 +132,7 @@ class AppConfig {
         contentPack: contentPack ?? this.contentPack,
         copy: copy ?? this.copy,
         minSupportedVersion: minSupportedVersion ?? this.minSupportedVersion,
+        flags: flags ?? this.flags,
         theme: theme ?? this.theme,
       );
 
@@ -132,6 +145,15 @@ Map<String, bool> _boolMap(Object? v) {
   final Map<String, bool> out = <String, bool>{};
   v.forEach((Object? k, Object? val) {
     if (val is bool) out['$k'] = val;
+  });
+  return out;
+}
+
+Map<String, int> _intMap(Object? v) {
+  if (v is! Map) return const <String, int>{};
+  final Map<String, int> out = <String, int>{};
+  v.forEach((Object? k, Object? val) {
+    if (val is num) out['$k'] = val.toInt();
   });
   return out;
 }

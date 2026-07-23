@@ -98,6 +98,30 @@ void main() {
       expect(c.contentPack, isNull);
     });
 
+    test('parses flags (percentage rollout); toJson omits them when empty', () {
+      final Map<String, Object?> j = sublyServerJson()
+        ..['flags'] = <String, Object?>{'new_home': 25, 'beta_search': 100};
+      final AppConfig c = AppConfig.fromJson(j);
+      expect(c.rolloutPercent('new_home'), 25);
+      expect(c.rolloutPercent('beta_search'), 100);
+      expect(c.rolloutPercent('absent'), 0); // absent ⇒ off
+      // round-trips through toJson
+      expect(AppConfig.fromJson(c.toJson()).rolloutPercent('new_home'), 25);
+      // a config with no flags does not emit the key (drift-safe)
+      expect(
+          AppConfig.fromJson(sublyServerJson()).toJson().containsKey('flags'),
+          isFalse);
+      // lenient/fail-safe: a wrong-typed value drops to 0 (off), a non-map
+      // flags block parses to empty — a garbled percent can never ship a flag.
+      expect(
+          AppConfig.fromJson(
+                  sublyServerJson()..['flags'] = <String, Object?>{'x': '50'})
+              .rolloutPercent('x'),
+          0);
+      expect(AppConfig.fromJson(sublyServerJson()..['flags'] = 'nope').flags,
+          isEmpty);
+    });
+
     test('feature() and text() honor their fallbacks', () {
       final AppConfig c = AppConfig.fromJson(sublyServerJson())
           .copyWith(copy: <String, String>{'welcome': 'Hi'});
