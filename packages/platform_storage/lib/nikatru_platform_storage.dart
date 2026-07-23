@@ -1,0 +1,6 @@
+/// Plugin-backed implementations of the NIKATRU core storage seams
+/// (`KeyValueStore`, `SecureStore`) for all six platforms. Inject these in the
+/// app/brick layer so `packages/core` stays pure Dart (ADR 005).
+library;
+
+export 'src/prefs_key_value_store.dart';
