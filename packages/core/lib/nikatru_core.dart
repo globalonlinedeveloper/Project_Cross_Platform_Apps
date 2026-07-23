@@ -11,6 +11,8 @@ export 'src/result.dart';
 export 'src/config/app_config.dart';
 export 'src/config/config_loader.dart';
 export 'src/config/default_configs.dart';
+export 'src/config/flag_resolver.dart';
+export 'src/config/version_gate.dart';
 export 'src/models/app_notification.dart';
 export 'src/models/entitlement.dart';
 export 'src/storage/key_value_store.dart';
