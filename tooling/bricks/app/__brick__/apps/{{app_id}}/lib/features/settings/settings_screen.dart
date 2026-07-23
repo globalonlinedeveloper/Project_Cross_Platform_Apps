@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_config.dart';
 
@@ -14,10 +15,12 @@ class SettingsScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: <Widget>[
-          const ListTile(
-            leading: Icon(Icons.mail_outline),
-            title: Text('Contact support'),
-            subtitle: Text(AppConfig.supportEmail),
+          ListTile(
+            leading: const Icon(Icons.mail_outline),
+            title: const Text('Contact support'),
+            subtitle: const Text(AppConfig.supportEmail),
+            trailing: const Icon(Icons.open_in_new, size: 18),
+            onTap: _contactSupport,
           ),
           ListTile(
             leading: const Icon(Icons.delete_outline),
@@ -33,6 +36,18 @@ class SettingsScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _contactSupport() async {
+    final Uri uri = Uri.parse(
+      'mailto:${AppConfig.supportEmail}'
+      '?subject=${Uri.encodeComponent('${AppConfig.appName} support')}',
+    );
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      // No mail client / launch failed — best-effort; never crash settings.
+    }
   }
 
   void _confirmDelete(BuildContext context) {
