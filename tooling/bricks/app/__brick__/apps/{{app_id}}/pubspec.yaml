@@ -25,6 +25,9 @@ dependencies:
   flutter_riverpod: ^2.5.0
   go_router: ^14.2.0
 
+  # Launch external URLs (support mailto, legal links) — all 6 platforms.
+  url_launcher: ^6.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
